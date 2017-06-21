@@ -1,0 +1,12 @@
+{
+  "name": "monadic",
+  "version": "0.0.1",
+  "description": "Basic monads and do-notation generator.",
+  "contributors": [
+    {
+      "name": "Joel Dentici",
+      "email": "joeldentici@cox.net"
+    }
+  ],
+  "main": "src/monadic.js"
+}

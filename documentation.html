@@ -1,0 +1,1001 @@
+
+	<html>
+		<head>
+			<title>Monadic Documentation</title>
+			<style>
+				.module-header, .module-description {
+					background-color: #EFEFEF;
+				}
+
+				.function-description {
+					background-color: #DDD;
+				}
+
+				.module-header {
+					border: 1px solid;
+					border-radius: 5px;
+					padding: 10px;
+					margin: 10px 0 10px 0;
+				}
+				.module-name {
+					font-weight: bold;
+				}
+				.module-description .module-name {
+					font-size: 120%;
+				}
+				ul.module-functions {
+					list-style: none;
+				}
+				.module-description {
+					border: 1px solid;
+					border-radius: 5px;
+					padding: 10px;
+					margin: 10px 0 10px 0;
+				}
+				.module-name, .module-author,
+				.module-date {
+					margin: 2px 0 2px 0;
+				}
+				.module-desc {
+					margin: 10px 0 10px 20px;
+				}
+
+				.function-description {
+					backgound-color: #EFEFEF;
+					border: 1px dotted;
+					border-radius: 5px;
+					padding: 10px;
+					margin: 5px 0 5px 0;
+				}
+
+				.function-desc {
+					margin: 5px 0 5px 20px;
+				}
+
+				a:visited {
+					color: #00F
+				}
+
+				a {
+					text-decoration: none;
+					border-bottom: 1px solid transparent;
+					transition: all ease-in-out 0.5s;
+				}
+
+				a:hover {
+					text-decoration: none;
+					border-color: #00F;
+				}
+
+				.top-scroll {
+					position: fixed;
+					bottom: 0;
+					right: 10px;
+					font-weight: bold;
+					font-size: 180%;
+					border: 1px solid;
+					border-radius: 5px;
+					padding: 10px 20px;
+					background-color: #EFEFEF;
+					opacity: 0.8;
+					cursor: pointer;
+				}
+			</style>
+			<script type="text/javascript">
+				window.onload = function() {
+					var links = document.querySelectorAll('a');
+					links.forEach(link => link.addEventListener('click', function(e) {
+						e.preventDefault();
+						var elm = this.href.substring(this.href.indexOf('#') + 1);
+						scrollToItemId(elm, 2);
+					}));
+
+					document.querySelector('.top-scroll').addEventListener('click', function() {
+						scrollToItemId('top', 2);
+					});
+
+					window.onscroll();
+				}
+
+				window.onscroll = function() {
+					document.querySelector('.top-scroll').style.visibility = 
+						document.body.scrollTop > 100 ? 'visible' : 'hidden';
+				}
+
+				function scrollToItemId(scrollToId, scrollTime) {
+					scrollTime *= 1000;
+			        var item = document.getElementById(scrollToId);
+
+			        var from = document.body.scrollTop;
+			        var to = item.offsetTop;
+
+			        var startTime = Date.now();
+
+				    function ease(k) {
+				    	return 0.5 * (1 - Math.cos(Math.PI * k));
+				    }
+
+			        (function scroll() {
+			        	var elapsed = (Date.now() - startTime) / scrollTime;
+			        	if (elapsed > 1)
+			        		elapsed = 1;
+			        	var change = ease(elapsed);
+			        	var currentPos = from + (to - from) * change;
+
+			            document.body.scrollTop = currentPos;
+			            if (currentPos !== to) {
+			                requestAnimationFrame(scroll);
+			            }
+			            else {
+			            	window.location.hash = '#' + scrollToId;
+			            }
+			        })();
+			    }
+			</script>
+		</head>
+		<body>
+			<div class="project-header" id="top">
+			<h1>Monadic Documentation</h1>
+			</div>
+			<div class="project-synopsis">
+			<h2>Module List</h2>
+			
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic">Monadic</a>
+			</div>
+			<ul class="module-functions">
+				
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Utility">Monadic.Utility</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Utility.func.doM">
+					<b>doM</b>
+				</a> <b>::</b> Monad m &#8658; (() &#8594; Iterator) &#8594; m a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Utility.func.mapM">
+					<b>mapM</b>
+				</a> <b>::</b> Monad m &#8658; Type m &#8594; (a &#8594; m b) &#8594; [a] &#8594; m [b]
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Either">Monadic.Either</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Either.func.unit">
+					<b>unit</b>
+				</a> <b>::</b> a &#8594; Right a
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Either.Left">Monadic.Either.Left</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Either.Left.func.new">
+					<b>new</b>
+				</a> <b>::</b> a &#8594; Left a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Either.Left.func.map">
+					<b>map</b>
+				</a> <b>::</b> Left c &#8594; (a &#8594; b) &#8594; Left c
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Either.Left.func.bind">
+					<b>bind</b>
+				</a> <b>::</b> Left c &#8594; (a &#8594; Either c b) &#8594; Left c
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Either.Left.func.doCase">
+					<b>doCase</b>
+				</a> <b>::</b> Left a &#8594; (a &#8594; b) &#8594; b
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Either.Right">Monadic.Either.Right</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Either.Right.func.new">
+					<b>new</b>
+				</a> <b>::</b> a &#8594; Right a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Either.Right.func.map">
+					<b>map</b>
+				</a> <b>::</b> Right a &#8594; (a &#8594; b) &#8594; Right b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Either.Right.func.bind">
+					<b>bind</b>
+				</a> <b>::</b> Right a &#8594; (a &#8594; Either c b) &#8594; Either c b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Either.Right.func.doCase">
+					<b>doCase</b>
+				</a> <b>::</b> Right a &#8594; (a &#8594; b) &#8594; b
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Free.Free">Monadic.Free.Free</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Free.Free.func.new">
+					<b>new</b>
+				</a> <b>::</b> f (Free f a) &#8594; Free f a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Free.Free.func.map">
+					<b>map</b>
+				</a> <b>::</b> Free f a &#8594; (a &#8594; b) &#8594; Free f b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Free.Free.func.bind">
+					<b>bind</b>
+				</a> <b>::</b> Free f a &#8594; (a &#8594; Free f b) &#8594; Free f b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Free.Free.func.doCase">
+					<b>doCase</b>
+				</a> <b>::</b> Free f a &#8594; (f (Free f a) &#8594; b) &#8594; b
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Free">Monadic.Free</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Free.func.unit">
+					<b>unit</b>
+				</a> <b>::</b> a &#8594; Free f a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Free.func.liftF">
+					<b>liftF</b>
+				</a> <b>::</b> f a &#8594; Free f a
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Free.Return">Monadic.Free.Return</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Free.Return.func.new">
+					<b>new</b>
+				</a> <b>::</b> a &#8594; Free f a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Free.Return.func.map">
+					<b>map</b>
+				</a> <b>::</b> Free f a &#8594; (a &#8594; b) &#8594; Free f b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Free.Return.func.bind">
+					<b>bind</b>
+				</a> <b>::</b> Free f a &#8594; (a &#8594; Free f b) &#8594; Free f b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Free.Return.func.doCase">
+					<b>doCase</b>
+				</a> <b>::</b> Free f a &#8594; (a &#8594; b) &#8594; b
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Maybe">Monadic.Maybe</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Maybe.func.unit">
+					<b>unit</b>
+				</a> <b>::</b> a &#8594; Just a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Maybe.func.nullable">
+					<b>nullable</b>
+				</a> <b>::</b> a &#8594; Maybe a
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Maybe.Just">Monadic.Maybe.Just</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Maybe.Just.func.new">
+					<b>new</b>
+				</a> <b>::</b> a &#8594; Just a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Maybe.Just.func.map">
+					<b>map</b>
+				</a> <b>::</b> Just a &#8594; (a &#8594; b) &#8594; Just b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Maybe.Just.func.bind">
+					<b>bind</b>
+				</a> <b>::</b> Just a &#8594; (a &#8594; Maybe b) &#8594; Maybe b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Maybe.Just.func.doCase">
+					<b>doCase</b>
+				</a> <b>::</b> Just a &#8594; (a &#8594; b) &#8594; b
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Maybe.Nothing">Monadic.Maybe.Nothing</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Maybe.Nothing.func.map">
+					<b>map</b>
+				</a> <b>::</b> Nothing &#8594; (a &#8594; b) &#8594; Nothing
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Maybe.Nothing.func.bind">
+					<b>bind</b>
+				</a> <b>::</b> Nothing &#8594; (a &#8594; Maybe b) &#8594; Nothing
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Maybe.Nothing.func.doCase">
+					<b>doCase</b>
+				</a> <b>::</b> Nothing &#8594; (() &#8594; b) &#8594; b
+			</li>
+		
+			</ul>
+		</div>
+	
+			</div>
+			<div class="project-description">
+			<h2>Module Description</h2>
+			
+		<div class="module-description" id="doc.module.Monadic">
+			<div class="module-name">
+				Module: Monadic
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			This library provides implementations of common
+monads in JavaScript.<br><br>Utility functions for working with monads abstractly are also
+provided, as well as a generator-based do-notation utility.
+			</div>
+			<div class="module-functions">
+				
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Utility">
+			<div class="module-name">
+				Module: Monadic.Utility
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			Utility functions for working with monads.
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Utility.func.doM">
+				<div class="function-name">
+					<b>doM</b> <b>::</b> Monad m &#8658; (() &#8594; Iterator) &#8594; m a
+				</div>
+				<div class="function-desc">
+					
+Do notation helper for monads. Taken from:
+https://curiosity-driven.org/monads-in-javascript<br><br>Example Usage:
+<pre>
+const result = doM(function() {
+const fst = yield Either.right(5);
+const snd = yield Either.right(11);
+return Either.unit(fst + snd);
+});
+</pre>
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Utility.func.mapM">
+				<div class="function-name">
+					<b>mapM</b> <b>::</b> Monad m &#8658; Type m &#8594; (a &#8594; m b) &#8594; [a] &#8594; m [b]
+				</div>
+				<div class="function-desc">
+					
+Maps a monadic function over a list of values, sequencing each
+application over the list, and collecting the results into a new
+list, which is lifted into the monadic type provided.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Either">
+			<div class="module-name">
+				Module: Monadic.Either
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			Defines the Either monad.
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Either.func.unit">
+				<div class="function-name">
+					<b>unit</b> <b>::</b> a &#8594; Right a
+				</div>
+				<div class="function-desc">
+					
+Puts a value into Either context.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Either.Left">
+			<div class="module-name">
+				Module: Monadic.Either.Left
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			The Left constructor
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Either.Left.func.new">
+				<div class="function-name">
+					<b>new</b> <b>::</b> a &#8594; Left a
+				</div>
+				<div class="function-desc">
+					
+Construct a Left
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Either.Left.func.map">
+				<div class="function-name">
+					<b>map</b> <b>::</b> Left c &#8594; (a &#8594; b) &#8594; Left c
+				</div>
+				<div class="function-desc">
+					
+Doesn't apply the function per Either semantics.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Either.Left.func.bind">
+				<div class="function-name">
+					<b>bind</b> <b>::</b> Left c &#8594; (a &#8594; Either c b) &#8594; Left c
+				</div>
+				<div class="function-desc">
+					
+Doesn't apply the function per Either semantics.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Either.Left.func.doCase">
+				<div class="function-name">
+					<b>doCase</b> <b>::</b> Left a &#8594; (a &#8594; b) &#8594; b
+				</div>
+				<div class="function-desc">
+					
+Applies the function to the value in the
+Left
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Either.Right">
+			<div class="module-name">
+				Module: Monadic.Either.Right
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			The Right constructor
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Either.Right.func.new">
+				<div class="function-name">
+					<b>new</b> <b>::</b> a &#8594; Right a
+				</div>
+				<div class="function-desc">
+					
+Construct a Right
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Either.Right.func.map">
+				<div class="function-name">
+					<b>map</b> <b>::</b> Right a &#8594; (a &#8594; b) &#8594; Right b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the value contained
+in this Right.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Either.Right.func.bind">
+				<div class="function-name">
+					<b>bind</b> <b>::</b> Right a &#8594; (a &#8594; Either c b) &#8594; Either c b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the value contained
+in this Right.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Either.Right.func.doCase">
+				<div class="function-name">
+					<b>doCase</b> <b>::</b> Right a &#8594; (a &#8594; b) &#8594; b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the value contained
+in this Right.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Free.Free">
+			<div class="module-name">
+				Module: Monadic.Free.Free
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			Implementation of the free monad.
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Free.Free.func.new">
+				<div class="function-name">
+					<b>new</b> <b>::</b> f (Free f a) &#8594; Free f a
+				</div>
+				<div class="function-desc">
+					
+Takes a value in the functor over the free monad over that
+functor and places it into the context of the free monad
+over that functor. In other words, this nests the free monad
+context one level, which will later be stripped away in an interpreter.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Free.Free.func.map">
+				<div class="function-name">
+					<b>map</b> <b>::</b> Free f a &#8594; (a &#8594; b) &#8594; Free f b
+				</div>
+				<div class="function-desc">
+					
+Apply the function within the free monad context.<br><br>This means we map the function recursively by mapping
+it on the free monad context contained in the functor
+contained in this free monad. Eventually we will hit a
+Return and the recursion will stop.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Free.Free.func.bind">
+				<div class="function-name">
+					<b>bind</b> <b>::</b> Free f a &#8594; (a &#8594; Free f b) &#8594; Free f b
+				</div>
+				<div class="function-desc">
+					
+Apply the function within the free monad context.<br><br>This means we bind the function to the free monad
+inside the functor in this free monad (which is
+recursive). Eventually we will hit a Return and the
+recursion will stop.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Free.Free.func.doCase">
+				<div class="function-name">
+					<b>doCase</b> <b>::</b> Free f a &#8594; (f (Free f a) &#8594; b) &#8594; b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the functor in this context.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Free">
+			<div class="module-name">
+				Module: Monadic.Free
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			Defines the Free monad over a Functor.<br><br>data Free f a = Free (f (Free f a)) | Return a
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Free.func.unit">
+				<div class="function-name">
+					<b>unit</b> <b>::</b> a &#8594; Free f a
+				</div>
+				<div class="function-desc">
+					
+Puts a value into the Free monad over
+a functor.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Free.func.liftF">
+				<div class="function-name">
+					<b>liftF</b> <b>::</b> f a &#8594; Free f a
+				</div>
+				<div class="function-desc">
+					
+Lifts a value in the functor into the Free
+monad over that functor.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Free.Return">
+			<div class="module-name">
+				Module: Monadic.Free.Return
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			The "leaves" of the Free functor nesting
+mess are contained in Return values.
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Free.Return.func.new">
+				<div class="function-name">
+					<b>new</b> <b>::</b> a &#8594; Free f a
+				</div>
+				<div class="function-desc">
+					
+Takes a value of type a and wraps it
+into the free monad.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Free.Return.func.map">
+				<div class="function-name">
+					<b>map</b> <b>::</b> Free f a &#8594; (a &#8594; b) &#8594; Free f b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the value contained
+in this container.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Free.Return.func.bind">
+				<div class="function-name">
+					<b>bind</b> <b>::</b> Free f a &#8594; (a &#8594; Free f b) &#8594; Free f b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the value contained in this
+container
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Free.Return.func.doCase">
+				<div class="function-name">
+					<b>doCase</b> <b>::</b> Free f a &#8594; (a &#8594; b) &#8594; b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the value contained
+in this context.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Maybe">
+			<div class="module-name">
+				Module: Monadic.Maybe
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			Defines the Maybe monad.
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Maybe.func.unit">
+				<div class="function-name">
+					<b>unit</b> <b>::</b> a &#8594; Just a
+				</div>
+				<div class="function-desc">
+					
+Puts a value into Maybe context.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Maybe.func.nullable">
+				<div class="function-name">
+					<b>nullable</b> <b>::</b> a &#8594; Maybe a
+				</div>
+				<div class="function-desc">
+					
+Puts a value into Maybe context. If it
+is null or undefined, Nothing is returned.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Maybe.Just">
+			<div class="module-name">
+				Module: Monadic.Maybe.Just
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			The Just constructor
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Maybe.Just.func.new">
+				<div class="function-name">
+					<b>new</b> <b>::</b> a &#8594; Just a
+				</div>
+				<div class="function-desc">
+					
+Construct a Just
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Maybe.Just.func.map">
+				<div class="function-name">
+					<b>map</b> <b>::</b> Just a &#8594; (a &#8594; b) &#8594; Just b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the value contained
+in this Just.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Maybe.Just.func.bind">
+				<div class="function-name">
+					<b>bind</b> <b>::</b> Just a &#8594; (a &#8594; Maybe b) &#8594; Maybe b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the value contained
+in this Just.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Maybe.Just.func.doCase">
+				<div class="function-name">
+					<b>doCase</b> <b>::</b> Just a &#8594; (a &#8594; b) &#8594; b
+				</div>
+				<div class="function-desc">
+					
+Apply the function to the value contained
+in this Just.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Maybe.Nothing">
+			<div class="module-name">
+				Module: Monadic.Maybe.Nothing
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/20/2017
+			</div>
+			<div class="module-desc">
+			The Nothing type
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Maybe.Nothing.func.map">
+				<div class="function-name">
+					<b>map</b> <b>::</b> Nothing &#8594; (a &#8594; b) &#8594; Nothing
+				</div>
+				<div class="function-desc">
+					
+Doesn't apply the function per Maybe semantics.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Maybe.Nothing.func.bind">
+				<div class="function-name">
+					<b>bind</b> <b>::</b> Nothing &#8594; (a &#8594; Maybe b) &#8594; Nothing
+				</div>
+				<div class="function-desc">
+					
+Doesn't apply the function per Maybe semantics.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Maybe.Nothing.func.doCase">
+				<div class="function-name">
+					<b>doCase</b> <b>::</b> Nothing &#8594; (() &#8594; b) &#8594; b
+				</div>
+				<div class="function-desc">
+					
+Applies the function
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+			</div>
+
+			<div class="top-scroll">
+					<a href="#top">&#8593;</a>
+			</div>
+
+			<div class="footer">
+			This documentation was generated by <code>hmdoc</code> on <code>6/20/2017, 11:08:18 PM</code>
+			</div>
+		</body>
+	</html>
+	
