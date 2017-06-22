@@ -1,5 +1,5 @@
 {
-  "name": "monadic",
+  "name": "monadic-js",
   "version": "0.0.1",
   "description": "Basic monads and do-notation generator.",
   "contributors": [
