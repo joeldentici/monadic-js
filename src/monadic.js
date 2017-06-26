@@ -12,11 +12,13 @@
  *	provided, as well as a generator-based do-notation utility.
  */
 
-/* Allow Promise to work with our do-notation */
+/* Make Promise to fit our monad interface */
 Promise.prototype.bind = Promise.prototype.then;
+Promise.prototype.unit = Promise.prototype.resolve;
 
 /* Export submodules */
 exports.Free = require('./free');
 exports.Utility = require('./utility.js');
 exports.Either = require('./either');
 exports.Maybe = require('./maybe');
+exports.Async = require('./async');
