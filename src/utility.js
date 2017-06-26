@@ -43,7 +43,7 @@ const doM = exports.doM = function(genFn) {
  *	application over the list, and collecting the results into a new
  *	list, which is lifted into the monadic type provided.
  */
-exports.mapM = function(monad, fn, lst) {
+const mapM = exports.mapM = function(monad, fn, lst) {
 	if (lst.length === 0) {
 		return monad.unit([]);
 	}
