@@ -8,5 +8,8 @@
       "email": "joeldentici@cox.net"
     }
   ],
-  "main": "src/monadic.js"
+  "main": "src/monadic.js",
+  "scripts": {
+    "document": "hmdoc 'Monadic JS' src > documentation.html"
+  }
 }

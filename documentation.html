@@ -1,7 +1,7 @@
 
 	<html>
 		<head>
-			<title>Monadic Documentation</title>
+			<title>Monadic JS Documentation</title>
 			<style>
 				.module-header, .module-description {
 					background-color: #EFEFEF;
@@ -135,7 +135,7 @@
 		</head>
 		<body>
 			<div class="project-header" id="top">
-			<h1>Monadic Documentation</h1>
+			<h1>Monadic JS Documentation</h1>
 			</div>
 			<div class="project-synopsis">
 			<h2>Module List</h2>
@@ -165,6 +165,93 @@
 				<a href="#doc.module.Monadic.Utility.func.mapM">
 					<b>mapM</b>
 				</a> <b>::</b> Monad m &#8658; Type m &#8594; (a &#8594; m b) &#8594; [a] &#8594; m [b]
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Async.AsyncComputation">Monadic.Async.AsyncComputation</a>
+			</div>
+			<ul class="module-functions">
+				
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Async.AsyncHandler">Monadic.Async.AsyncHandler</a>
+			</div>
+			<ul class="module-functions">
+				
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Async">Monadic.Async</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Async.func.create">
+					<b>create</b>
+				</a> <b>::</b> ((a &#8594; ()) &#8594; (b &#8594; ()) &#8594; ()) &#8594; Async b a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.catch">
+					<b>catch</b>
+				</a> <b>::</b> Async b a &#8594; (b &#8594; Async c d) &#8594; Async c d
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.try">
+					<b>try</b>
+				</a> <b>::</b> Async b a &#8594; Async b a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.wrap">
+					<b>wrap</b>
+				</a> <b>::</b> (...any &#8594; (b &#8594; c &#8594; ()) &#8594; ()) &#8594; ...any &#8594; Async b c
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.unit">
+					<b>unit</b>
+				</a> <b>::</b> a &#8594; Async () a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.fail">
+					<b>fail</b>
+				</a> <b>::</b> a &#8594; Async a ()
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.run">
+					<b>run</b>
+				</a> <b>::</b> Async b a &#8594; Promise a b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.prepare">
+					<b>prepare</b>
+				</a> <b>::</b> Interpreter &#8594; () &#8594; Async ()
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.map">
+					<b>map</b>
+				</a> <b>::</b> Interpreter &#8594; AsyncComputation ((a &#8594; ()) &#8594; (b &#8594; ()) &#8594; ()) &#8594; Async b a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.cleanup">
+					<b>cleanup</b>
+				</a> <b>::</b> Interpreter &#8594; Async b a &#8594; Async b a
 			</li>
 		
 			</ul>
@@ -300,6 +387,12 @@
 				<a href="#doc.module.Monadic.Free.func.liftF">
 					<b>liftF</b>
 				</a> <b>::</b> f a &#8594; Free f a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Free.func.createInterpreter">
+					<b>createInterpreter</b>
+				</a> <b>::</b> Functor[f_0|f_n] &#8658; MonadFail m &#8594; [Interpreter[m, f_0|f_n]] &#8594; Free [f_0|f_n] a &#8594; m a
 			</li>
 		
 			</ul>
@@ -487,6 +580,191 @@ return Either.unit(fst + snd);
 Maps a monadic function over a list of values, sequencing each
 application over the list, and collecting the results into a new
 list, which is lifted into the monadic type provided.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Async.AsyncComputation">
+			<div class="module-name">
+				Module: Monadic.Async.AsyncComputation
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/25/2017
+			</div>
+			<div class="module-desc">
+			Holds a thunked computation.
+			</div>
+			<div class="module-functions">
+				
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Async.AsyncHandler">
+			<div class="module-name">
+				Module: Monadic.Async.AsyncHandler
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/25/2017
+			</div>
+			<div class="module-desc">
+			Holds an AsyncComputation and a handler
+for a failed computation.
+			</div>
+			<div class="module-functions">
+				
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Async">
+			<div class="module-name">
+				Module: Monadic.Async
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/25/2017
+			</div>
+			<div class="module-desc">
+			The Async monad represents computations
+that run in an asynchronous context.<br><br>Unlike Promises, an Async computation is
+lazily evaluated, so it won't be executed
+immediately.<br><br>Async provides an Interpreter to be used
+with the Free.createInterpreter function so it
+can be used with other Free monads. It maps to
+Async, as it is expected that most interpreters
+will do the same. Because of this, it essentially
+doesn't do anything.<br><br>A method called run is also provided to 
+interpret an Async into a Promise.
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.create">
+				<div class="function-name">
+					<b>create</b> <b>::</b> ((a &#8594; ()) &#8594; (b &#8594; ()) &#8594; ()) &#8594; Async b a
+				</div>
+				<div class="function-desc">
+					
+Creates an Async computation. Takes a function that
+accepts two functions, one for a successful computation
+an one for a failed computation. This function is not
+executed until the Async is ran.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.catch">
+				<div class="function-name">
+					<b>catch</b> <b>::</b> Async b a &#8594; (b &#8594; Async c d) &#8594; Async c d
+				</div>
+				<div class="function-desc">
+					
+Creates an Async handler. This takes an Async computation
+and an error handler function.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.try">
+				<div class="function-name">
+					<b>try</b> <b>::</b> Async b a &#8594; Async b a
+				</div>
+				<div class="function-desc">
+					
+Adds a "catch" method to the provided Async computation.
+This is a convenience method to allow Async.catch to be
+infix, and make monadic code look more imperative.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.wrap">
+				<div class="function-name">
+					<b>wrap</b> <b>::</b> (...any &#8594; (b &#8594; c &#8594; ()) &#8594; ()) &#8594; ...any &#8594; Async b c
+				</div>
+				<div class="function-desc">
+					
+Wraps a callback taking async function so it becomes a function
+that returns Async computations.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.unit">
+				<div class="function-name">
+					<b>unit</b> <b>::</b> a &#8594; Async () a
+				</div>
+				<div class="function-desc">
+					
+Puts a value into the context of
+an Async computation.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.fail">
+				<div class="function-name">
+					<b>fail</b> <b>::</b> a &#8594; Async a ()
+				</div>
+				<div class="function-desc">
+					
+Returns an Async computation that failed
+for the specified reason.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.run">
+				<div class="function-name">
+					<b>run</b> <b>::</b> Async b a &#8594; Promise a b
+				</div>
+				<div class="function-desc">
+					
+Runs the asynchronous computation and
+returns a promise for the result.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.prepare">
+				<div class="function-name">
+					<b>prepare</b> <b>::</b> Interpreter &#8594; () &#8594; Async ()
+				</div>
+				<div class="function-desc">
+					
+Prepares interpretation context for Async.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.map">
+				<div class="function-name">
+					<b>map</b> <b>::</b> Interpreter &#8594; AsyncComputation ((a &#8594; ()) &#8594; (b &#8594; ()) &#8594; ()) &#8594; Async b a
+				</div>
+				<div class="function-desc">
+					
+Maps an AsyncComputation into a new Async, essentially doing
+nothing.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.cleanup">
+				<div class="function-name">
+					<b>cleanup</b> <b>::</b> Interpreter &#8594; Async b a &#8594; Async b a
+				</div>
+				<div class="function-desc">
+					
+We don't need to clean up anything.
 				</div>
 			</div>
 		
@@ -760,6 +1038,19 @@ monad over that functor.
 				</div>
 			</div>
 		
+			<div class="function-description"
+			id="doc.module.Monadic.Free.func.createInterpreter">
+				<div class="function-name">
+					<b>createInterpreter</b> <b>::</b> Functor[f_0|f_n] &#8658; MonadFail m &#8594; [Interpreter[m, f_0|f_n]] &#8594; Free [f_0|f_n] a &#8594; m a
+				</div>
+				<div class="function-desc">
+					
+Creates an interpreter that can interpret a "composite" of Free
+monads.<br><br>A monad with an additional "fail" operation is supplied.<br><br>An Interpreter constructor is supplied for each type of Free
+monad that this new interpreter will work for.
+				</div>
+			</div>
+		
 			</div>
 		</div>
 	
@@ -994,7 +1285,7 @@ Applies the function
 			</div>
 
 			<div class="footer">
-			This documentation was generated by <code>hmdoc</code> on <code>6/20/2017, 11:08:18 PM</code>
+			This documentation was generated by <code>hmdoc</code> on <code>6/26/2017, 11:10:57 PM</code>
 			</div>
 		</body>
 	</html>

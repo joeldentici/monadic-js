@@ -131,7 +131,7 @@ Other Free monads will provide interpreters to
 */
 Async.interpreter = () => ({
 	/**
-	 *	prepare :: Async.interpret -> () -> Async ()
+	 *	prepare :: Interpreter -> () -> Async ()
 	 *
 	 *	Prepares interpretation context for Async.
 	 */
@@ -140,7 +140,7 @@ Async.interpreter = () => ({
 	},
 
 	/**
-	 *	map :: AsyncComputation ((a -> ()) -> (b -> ()) -> ()) -> Async b a
+	 *	map :: Interpreter -> AsyncComputation ((a -> ()) -> (b -> ()) -> ()) -> Async b a
 	 *
 	 *	Maps an AsyncComputation into a new Async, essentially doing
 	 *	nothing.
@@ -154,7 +154,7 @@ Async.interpreter = () => ({
 	},
 
 	/**
-	 *	cleanup :: Async b a -> Async b a
+	 *	cleanup :: Interpreter -> Async b a -> Async b a
 	 *
 	 *	We don't need to clean up anything.
 	 */
