@@ -50,7 +50,7 @@ exports.createInterpreter = function(monad, ...interpreters) {
 	return function(comp) {
 		//get an instance of each interpreter
 		//is :: [Interpreter]
-		const is = interpreters.map(i => i());
+		const is = interpreters.map(i => i(execute));
 
 		//prepare context for all interpreters, get a monad value
 		//for when all are done being prepared
@@ -71,8 +71,10 @@ exports.createInterpreter = function(monad, ...interpreters) {
 							const [v, n] = res;
 							if (typeof n === 'function')
 								return v.bind(x => execute(n(x)));
-							else
+							else if (typeof n === 'object' && n)
 								return v.bind(_ => execute(n));
+							else
+								return v;
 						}
 					}
 
@@ -92,12 +94,14 @@ exports.createInterpreter = function(monad, ...interpreters) {
 		//cleanup each interpreter's context to get an array
 		//of results
 		//clean :: m [a]
-		const clean = all(is.map(i => i.cleanup(res)));
+		const clean = monad.try(res
+			.bind(r => all(is.map(i => i.cleanup(r)))))
+			.catch(e => all(is.map(i => i.cleanupErr(e))));
 
 		//it is expected that a successful cleanup will always
 		//return the interpretation result, so in the success
 		//case, this will return the result
 		// :: m a
-		return clean.bind(([r1]) => r1);
+		return clean.map(([r1]) => r1);
 	}
 }

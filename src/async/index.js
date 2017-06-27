@@ -107,19 +107,29 @@ class Async {
 	 *
 	 *	Runs the asynchronous computation and
 	 *	returns a promise for the result.
+	 *
+	 *	run only runs the Async on the first application.
+	 *	Any subsequent applications will return the promise
+	 *	from the first application.
 	 */
 	static run(comp) {
-		return comp.case({
-			Free: x => x.case({
-				AsyncComputation: (t, n) => new Promise(t).then(v => Async.run(n(v))),
-				AsyncHandler: (a, h, n) => Async.run(a)
-					.catch(e => Async.run(h(e)))
-					.then(v => Async.run(n(v))),
-				default: () => Promise.reject(new Error(
-					"Expected Async computation, got: " + x.__type__)),
-			}),
-			Return: x => Promise.resolve(x),
-		});
+		if (!comp.__res__) {
+			const res = comp.case({
+				Free: x => x.case({
+					AsyncComputation: (t, n) => new Promise(t).then(v => Async.run(n(v))),
+					AsyncHandler: (a, h, n) => Async.run(a)
+						.catch(e => Async.run(h(e)))
+						.then(v => Async.run(n(v))),
+					default: () => Promise.reject(new Error(
+						"Expected Async computation, got: " + x.__type__)),
+				}),
+				Return: x => Promise.resolve(x),
+			});
+
+			comp.__res__ = res;
+		}
+
+		return comp.__res__;
 	}
 }
 
@@ -154,12 +164,21 @@ Async.interpreter = () => ({
 	},
 
 	/**
-	 *	cleanup :: Interpreter -> Async b a -> Async b a
+	 *	cleanup :: Interpreter -> a -> Async () a
 	 *
 	 *	We don't need to clean up anything.
 	 */
 	cleanup(result) {
-		return result;
+		return Async.unit(result);
+	},
+
+	/**
+	 *	cleanupErr :: Interpreter -> b -> Async b ()
+	 *
+	 *	We don't need to clean up anything.
+	 */
+	cleanupErr(err) {
+		return Async.fail(err);
 	}
 });
 
