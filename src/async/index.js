@@ -1,5 +1,6 @@
 const AsyncComputation = require('./asynccomputation.js');
 const AsyncHandler = require('./asynchandler.js');
+const AsyncFirst = require('./asyncfirst.js');
 const Free = require('../free');
 
 /**
@@ -120,6 +121,9 @@ class Async {
 					AsyncHandler: (a, h, n) => Async.run(a)
 						.catch(e => Async.run(h(e)))
 						.then(v => Async.run(n(v))),
+					AsyncFirst: (cs, n) => Promise
+						.race(cs.map(c => Async.run(c)))
+						.then(v => Async.run(n(v))),
 					default: () => Promise.reject(new Error(
 						"Expected Async computation, got: " + x.__type__)),
 				}),
@@ -130,6 +134,28 @@ class Async {
 		}
 
 		return comp.__res__;
+	}
+
+	/**
+	 *	sleep :: int -> Async ()
+	 *
+	 *	Creates an Async computation that sleeps for the specified
+	 *	timespan in milliseconds and returns no result.
+	 */
+	static sleep(ms) {
+		return Async.create((succ, fail) => setTimeout(succ, ms));
+	}
+
+
+	/**
+	 *	first :: ...Async e a -> Async e a
+	 *
+	 *	Returns an Async computation whose result is
+	 *	the result of the first provided computation to
+	 *	finish.
+	 */
+	static first(...comps) {
+		return Free.liftF(new AsyncFirst(comps, x => x));
 	}
 }
 
@@ -159,6 +185,7 @@ Async.interpreter = () => ({
 		return comp.case({
 			AsyncComputation: (t, n) => [Async.create(t), n],
 			AsyncHandler: (a, h, n) => [Async.catch(a, h), n],
+			AsyncFirst: (cs, n) => [Async.first(...cs), n],
 			default: () => null,
 		});
 	},
