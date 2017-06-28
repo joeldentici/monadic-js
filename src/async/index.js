@@ -157,15 +157,25 @@ class Async {
 	static first(...comps) {
 		return Free.liftF(new AsyncFirst(comps, x => x));
 	}
+
+	/**
+	 *	throwE :: e -> Async e ()
+	 *
+	 *	Alias of fail
+	 */
+	static throwE(e) {
+		return Async.fail(e);
+	}
 }
 
 /* The Async interpreter doesn't do anything,
 it just exists so Async can be used with other
 Free monads. It literally maps Asyncs back onto Asyncs.
 
-Other Free monads will provide interpreters to 
+Other Free monads will provide interpreters to map to
+Async as well
 */
-Async.interpreter = () => ({
+Async.interpreter = (execute) => ({
 	/**
 	 *	prepare :: Interpreter -> () -> Async ()
 	 *
@@ -176,7 +186,7 @@ Async.interpreter = () => ({
 	},
 
 	/**
-	 *	map :: Interpreter -> AsyncComputation ((a -> ()) -> (b -> ()) -> ()) -> Async b a
+	 *	map :: Interpreter -> AsyncFunctor b a -> [Async b a, (a -> Free f a | Free f a)]
 	 *
 	 *	Maps an AsyncComputation into a new Async, essentially doing
 	 *	nothing.
@@ -184,8 +194,8 @@ Async.interpreter = () => ({
 	map(comp) {
 		return comp.case({
 			AsyncComputation: (t, n) => [Async.create(t), n],
-			AsyncHandler: (a, h, n) => [Async.catch(a, h), n],
-			AsyncFirst: (cs, n) => [Async.first(...cs), n],
+			AsyncHandler: (a, h, n) => [Async.catch(execute(a), h), n],
+			AsyncFirst: (cs, n) => [Async.first(cs.map(execute)), n],
 			default: () => null,
 		});
 	},
