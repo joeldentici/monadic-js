@@ -181,6 +181,15 @@
 	
 		<div class="module-header">
 			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Async.AsyncFirst">Monadic.Async.AsyncFirst</a>
+			</div>
+			<ul class="module-functions">
+				
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
 			Module: <a href="#doc.module.Monadic.Async.AsyncHandler">Monadic.Async.AsyncHandler</a>
 			</div>
 			<ul class="module-functions">
@@ -237,6 +246,30 @@
 			</li>
 		
 			<li>
+				<a href="#doc.module.Monadic.Async.func.sleep">
+					<b>sleep</b>
+				</a> <b>::</b> int &#8594; Async ()
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.first">
+					<b>first</b>
+				</a> <b>::</b> ...Async e a &#8594; Async e a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.throwE">
+					<b>throwE</b>
+				</a> <b>::</b> e &#8594; Async e ()
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.await">
+					<b>await</b>
+				</a> <b>::</b> Promise a e &#8594; Async e a
+			</li>
+		
+			<li>
 				<a href="#doc.module.Monadic.Async.func.prepare">
 					<b>prepare</b>
 				</a> <b>::</b> Interpreter &#8594; () &#8594; Async ()
@@ -245,19 +278,19 @@
 			<li>
 				<a href="#doc.module.Monadic.Async.func.map">
 					<b>map</b>
-				</a> <b>::</b> Interpreter &#8594; AsyncComputation ((a &#8594; ()) &#8594; (b &#8594; ()) &#8594; ()) &#8594; Async b a
+				</a> <b>::</b> Interpreter &#8594; AsyncFunctor b a &#8594; [Async b a, (a &#8594; Free f a | Free f a)]
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.cleanup">
 					<b>cleanup</b>
-				</a> <b>::</b> Interpreter &#8594; a &#8594; Async () a
+				</a> <b>::</b> Interpreter &#8594; a &#8594; Async () ()
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.cleanupErr">
 					<b>cleanupErr</b>
-				</a> <b>::</b> Interpreter &#8594; b &#8594; Async b ()
+				</a> <b>::</b> Interpreter &#8594; b &#8594; Async () ()
 			</li>
 		
 			</ul>
@@ -610,6 +643,24 @@ list, which is lifted into the monadic type provided.
 			</div>
 		</div>
 	
+		<div class="module-description" id="doc.module.Monadic.Async.AsyncFirst">
+			<div class="module-name">
+				Module: Monadic.Async.AsyncFirst
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/25/2017
+			</div>
+			<div class="module-desc">
+			Holds a set of AsyncComputations.
+			</div>
+			<div class="module-functions">
+				
+			</div>
+		</div>
+	
 		<div class="module-description" id="doc.module.Monadic.Async.AsyncHandler">
 			<div class="module-name">
 				Module: Monadic.Async.AsyncHandler
@@ -743,6 +794,54 @@ from the first application.
 			</div>
 		
 			<div class="function-description"
+			id="doc.module.Monadic.Async.func.sleep">
+				<div class="function-name">
+					<b>sleep</b> <b>::</b> int &#8594; Async ()
+				</div>
+				<div class="function-desc">
+					
+Creates an Async computation that sleeps for the specified
+timespan in milliseconds and returns no result.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.first">
+				<div class="function-name">
+					<b>first</b> <b>::</b> ...Async e a &#8594; Async e a
+				</div>
+				<div class="function-desc">
+					
+Returns an Async computation whose result is
+the result of the first provided computation to
+finish.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.throwE">
+				<div class="function-name">
+					<b>throwE</b> <b>::</b> e &#8594; Async e ()
+				</div>
+				<div class="function-desc">
+					
+Alias of fail
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.await">
+				<div class="function-name">
+					<b>await</b> <b>::</b> Promise a e &#8594; Async e a
+				</div>
+				<div class="function-desc">
+					
+This will wait for the value from the
+specified promise when the Async is ran.
+				</div>
+			</div>
+		
+			<div class="function-description"
 			id="doc.module.Monadic.Async.func.prepare">
 				<div class="function-name">
 					<b>prepare</b> <b>::</b> Interpreter &#8594; () &#8594; Async ()
@@ -756,7 +855,7 @@ Prepares interpretation context for Async.
 			<div class="function-description"
 			id="doc.module.Monadic.Async.func.map">
 				<div class="function-name">
-					<b>map</b> <b>::</b> Interpreter &#8594; AsyncComputation ((a &#8594; ()) &#8594; (b &#8594; ()) &#8594; ()) &#8594; Async b a
+					<b>map</b> <b>::</b> Interpreter &#8594; AsyncFunctor b a &#8594; [Async b a, (a &#8594; Free f a | Free f a)]
 				</div>
 				<div class="function-desc">
 					
@@ -768,7 +867,7 @@ nothing.
 			<div class="function-description"
 			id="doc.module.Monadic.Async.func.cleanup">
 				<div class="function-name">
-					<b>cleanup</b> <b>::</b> Interpreter &#8594; a &#8594; Async () a
+					<b>cleanup</b> <b>::</b> Interpreter &#8594; a &#8594; Async () ()
 				</div>
 				<div class="function-desc">
 					
@@ -779,7 +878,7 @@ We don't need to clean up anything.
 			<div class="function-description"
 			id="doc.module.Monadic.Async.func.cleanupErr">
 				<div class="function-name">
-					<b>cleanupErr</b> <b>::</b> Interpreter &#8594; b &#8594; Async b ()
+					<b>cleanupErr</b> <b>::</b> Interpreter &#8594; b &#8594; Async () ()
 				</div>
 				<div class="function-desc">
 					
@@ -1304,7 +1403,7 @@ Applies the function
 			</div>
 
 			<div class="footer">
-			This documentation was generated by <code>hmdoc</code> on <code>6/27/2017, 11:07:14 AM</code>
+			This documentation was generated by <code>hmdoc</code> on <code>6/29/2017, 1:37:00 PM</code>
 			</div>
 		</body>
 	</html>
