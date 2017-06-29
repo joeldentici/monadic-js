@@ -94,14 +94,17 @@ exports.createInterpreter = function(monad, ...interpreters) {
 		//cleanup each interpreter's context to get an array
 		//of results
 		//clean :: m [a]
-		const clean = monad.try(res
-			.bind(r => all(is.map(i => i.cleanup(r)))))
-			.catch(e => all(is.map(i => i.cleanupErr(e))));
+		const clean = monad.try(
+				//cleanup all interpreters, and return the result
+				res.bind(r => all(is.map(i => i.cleanup(r)))
+							  .map(_ => r))
+			)
+			//cleanup all interpreters and return the error
+			.catch(e => all(is.map(i => i.cleanupErr(e)))
+						.bind(_ => monad.fail(e)));
 
-		//it is expected that a successful cleanup will always
-		//return the interpretation result, so in the success
-		//case, this will return the result
-		// :: m a
-		return clean.map(([r1]) => r1);
+		//this will contain the result if everything was successful,
+		//otherwise an error describing what went wrong.
+		return clean;
 	}
 }

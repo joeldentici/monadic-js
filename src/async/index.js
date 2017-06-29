@@ -166,6 +166,16 @@ class Async {
 	static throwE(e) {
 		return Async.fail(e);
 	}
+
+	/**
+	 *	await :: Promise a e -> Async e a
+	 *
+	 *	This will wait for the value from the
+	 *	specified promise when the Async is ran.
+	 */
+	static await(promise) {
+		return Async.create((succ, fail) => promise.then(succ, fail));
+	}
 }
 
 /* The Async interpreter doesn't do anything,
@@ -201,21 +211,21 @@ Async.interpreter = (execute) => ({
 	},
 
 	/**
-	 *	cleanup :: Interpreter -> a -> Async () a
+	 *	cleanup :: Interpreter -> a -> Async () ()
 	 *
 	 *	We don't need to clean up anything.
 	 */
 	cleanup(result) {
-		return Async.unit(result);
+		return Async.unit();
 	},
 
 	/**
-	 *	cleanupErr :: Interpreter -> b -> Async b ()
+	 *	cleanupErr :: Interpreter -> b -> Async () ()
 	 *
 	 *	We don't need to clean up anything.
 	 */
 	cleanupErr(err) {
-		return Async.fail(err);
+		return Async.unit();
 	}
 });
 
