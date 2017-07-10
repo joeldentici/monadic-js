@@ -1,6 +1,7 @@
 'use strict';
 const CaseClass = require('js-helpers').CaseClass;
 
+const Free = module.exports = (a) => new Free_(a);
 /**
  *	Monadic.Free.Free
  *	written by Joel Dentici
@@ -9,7 +10,7 @@ const CaseClass = require('js-helpers').CaseClass;
  *
  *	Implementation of the free monad.
  */
-class Free extends CaseClass {
+class Free_ extends CaseClass {
 	/**
 	 *	new :: f (Free f a) -> Free f a
 	 *
@@ -34,7 +35,7 @@ class Free extends CaseClass {
 	 *	Return and the recursion will stop.
 	 */
 	map(f) {
-		return new Free(this.x.map(
+		return Free(this.x.map(
 			v => v.map(f)));
 	}
 
@@ -49,7 +50,7 @@ class Free extends CaseClass {
 	 *	recursion will stop.
 	 */
 	bind(f) {
-		return new Free(this.x.map(
+		return Free(this.x.map(
 			v => v.bind(f)));
 	}
 
@@ -61,6 +62,18 @@ class Free extends CaseClass {
 	doCase(fn) {
 		return fn(this.x);
 	}
-}
 
-module.exports = (a) => new Free(a);
+	/**
+	 *	ap :: Free f (a -> b) -> Free f a -> Free f b
+	 *
+	 *	Applies the function in this Free to the value
+	 *	inside the provided Free.
+	 */
+	ap(v) {
+		const ma = this.x;
+		return v.case({
+			Return: b => Free(ma.map(x => x.map(f => f(b)))),
+			Free: mb => Free(ma.map(a => b => a.ap(b)).ap(mb)),
+		});
+	}
+}

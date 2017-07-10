@@ -1,5 +1,7 @@
 'use strict';
 const CaseClass = require('js-helpers').CaseClass;
+const Return = module.exports = (a) => new Return_(a);
+const Free = require('./free.js');
 
 /**
  *	Monadic.Free.Return
@@ -9,7 +11,7 @@ const CaseClass = require('js-helpers').CaseClass;
  *	The "leaves" of the Free functor nesting
  *	mess are contained in Return values.
  */
-class Return extends CaseClass {
+class Return_ extends CaseClass {
 	/**
 	 *	new :: a -> Free f a
 	 *
@@ -28,7 +30,7 @@ class Return extends CaseClass {
 	 *	in this container.
 	 */
 	map(f) {
-		return new Return(f(this.val));
+		return Return(f(this.val));
 	}
 
 	/**
@@ -50,6 +52,18 @@ class Return extends CaseClass {
 	doCase(fn) {
 		return fn(this.val);
 	}
-}
 
-module.exports = (a) => new Return(a);
+	/**
+	 *	ap :: Free f (a -> b) -> Free f a -> Free f b
+	 *
+	 *	Applies the function in this Return to the
+	 *	value in the provided Free.
+	 */
+	ap(v) {
+		const a = this.val;
+		return v.case({
+			Return: b => Return(a(b)),
+			Free: mb => Free(mb.map(x => x.map(a))),
+		});
+	}
+}

@@ -36,6 +36,8 @@ const doM = exports.doM = function(genFn) {
 	return step();
 }
 
+//TODO: This should be aliased to traverse for Traversables
+//once the Traversable and Foldable definitions are ready
 /**
  *	mapM :: Monad m => Type m -> (a -> m b) -> [a] -> m [b]
  *
@@ -55,3 +57,13 @@ const mapM = exports.mapM = function(monad, fn, lst) {
 		});
 	}
 }
+
+/*const mapM = exports.mapM = function(monad, fn, lst) {
+	const actions = lst.map(fn);
+
+	return actions.reduce(
+		(acc, action) => acc.bind(acc =>
+			action.map(val => acc.concat(val))),
+		monad.unit([])
+	);
+}*/

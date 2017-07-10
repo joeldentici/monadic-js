@@ -2,6 +2,7 @@ const AsyncComputation = require('./asynccomputation.js');
 const AsyncHandler = require('./asynchandler.js');
 const AsyncFirst = require('./asyncfirst.js');
 const Free = require('../free');
+const {mapM} = require('../utility.js');
 
 /**
  *	Monadic.Async
@@ -84,6 +85,19 @@ class Async {
 	}
 
 	/**
+	 *	wrapPromise :: (...any -> Promise a e) -> ...any -> Async a e
+	 *
+	 *	Wraps a promise returning async function so it becomes a function
+	 *	that returns Async computations.
+	 */
+	static wrapPromise(fn) {
+		return function(...args) {
+			return Async.create((succ, fail) => 
+				fn(...args).then(succ, fail));
+		}
+	}
+
+	/**
 	 *	unit :: a -> Async () a
 	 *
 	 *	Puts a value into the context of
@@ -146,6 +160,16 @@ class Async {
 		return Async.create((succ, fail) => setTimeout(succ, ms));
 	}
 
+	/**
+	 *	all :: ...Async e a -> Async e [a]
+	 *
+	 *	Returns an Async computation whose result
+	 *	combines all the results from the provided
+	 *	Asyncs.
+	 */
+	static all(...comps) {
+		return mapM(Async, x => x, comps);
+	}
 
 	/**
 	 *	first :: ...Async e a -> Async e a
