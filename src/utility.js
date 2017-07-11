@@ -50,11 +50,17 @@ const mapM = exports.mapM = function(monad, fn, lst) {
 		return monad.unit([]);
 	}
 	else {
+		return fn(lst[0]).bind(x =>
+			mapM(monad, fn, lst.slice(1)).map(xs =>
+				[x].concat(xs)
+			)
+		);
+/*
 		return doM(function*() {
 			const fst = yield fn(lst[0]);
 			const rest = yield mapM(monad, fn, lst.slice(1));
 			return monad.unit([fst].concat(rest));
-		});
+		});*/
 	}
 }
 

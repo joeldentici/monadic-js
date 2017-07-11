@@ -226,38 +226,8 @@ class Parser_ {
 	get many() {
 		return this.or(Parser.empty)
 			.bind(x => x ?
-			 this.many.map(xs => [].concat(x, xs))
+			 this.many.map(xs => [x].concat(xs))
 			  : Parser.of([]));
-		//.map(cons).app(Parser.recursive(this.many));
-
-/*
-		const self = this;
-		return Parser(t => p => lrec => doM(function*() {
-			const res = [];
-			let go = true;
-			let init_p = p;
-			let allUsed = ImmutableSet();
-			while (go) {
-				const r = yield self.runParser(t)(p)(getlrec(lrec, init_p, p));
-				r.case({
-					Right: ({pos, val,used}) => {
-						p = pos;
-						res.push(val);
-						if (p === init_p)
-							allUsed = allUsed.union(used);
-					},
-					Left: ({pos, err,used}) => {
-						go = false;
-						if (pos === init_p)
-							allUsed = allUsed.union(used);
-					}
-				});
-			}
-
-			return State.unit(Succeed(p)(res)(allUsed));
-		}));
-
-*/
 	}
 
 	/**
@@ -591,12 +561,6 @@ function lookup(parser, pos, current, table) {
 
 	const [res, stCtx] = stored;
 
-	/*const extract = ({used}) => used.size;
-	const size = res.case({
-		Left: extract,
-		Right: extract
-	});*/
-
 	if (canReuse(current, stCtx)) {
 		return res;
 	}
@@ -922,3 +886,7 @@ Parser.showError = err => (tokens, context = 30) => {
 
 	return message;
 }
+
+const {mapM} = require('../utility.js');
+
+Parser.seq = (...parsers) => mapM(Parser, x => x, parsers);

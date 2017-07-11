@@ -39,7 +39,7 @@ module.exports = Parser;
 
 
 /**
- *	runParser :: (Parser t a, bool) -> [t] -> Either ParseError (ParseResult a)
+ *	runParser :: (Parser t a, bool?) -> ([t], int?) -> Either ParseError (ParseResult a)
  *
  *	Runs the provided parser on the provided input. Either
  *	a ParseError or ParseResult a is returned depending on
@@ -47,8 +47,7 @@ module.exports = Parser;
  *	in the input last parsed. ParseError additionally contains an
  *	Error and ParseResult contains a value of type a.
  */
-Parser.runParser = (parser, consumeAll = true) => input => {
-	const pos = 0;
+Parser.runParser = (parser, consumeAll = true) => (input, pos = 0) => {
 	const state = ImmutableMap();
 	const lrec = ImmutableMap();
 
