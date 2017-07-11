@@ -33,17 +33,6 @@ class StringExpression extends CaseClass {
 	}
 }
 
-class DeleteExpression extends CaseClass {
-	constructor(expr) {
-		super('DeleteExpression');
-		this.expr = expr;
-	}
-
-	doCase(fn) {
-		return fn(this.expr);
-	}
-}
-
 class ArrayExpression extends CaseClass {
 	constructor(expressions) {
 		super('ArrayExpression');
@@ -86,18 +75,6 @@ class IdBinding extends CaseClass {
 
 	doCase(fn) {
 		return fn(this.expr);
-	}
-}
-
-class FunctionApplicationExpression extends CaseClass {
-	constructor(fnExpr, args) {
-		super('FunctionApplicationExpression');
-		this.fnExpr = fnExpr;
-		this.args = args;
-	}
-
-	doCase(fn) {
-		return fn(this.fnExpr, this.args);
 	}
 }
 
@@ -166,32 +143,6 @@ class ArrowExpression extends CaseClass {
 
 	doCase(fn) {
 		return fn(this.signature, this.body);
-	}
-}
-
-class BracketResolutionExpression extends CaseClass {
-	constructor(inExpr, whatExpr) {
-		super('BracketResolutionExpression');
-		this.inExpr = inExpr;
-		this.whatExpr = whatExpr;
-	}
-
-	doCase(fn) {
-		return fn(this.inExpr, this.whatExpr);
-	}
-}
-
-
-
-class DotResolutionExpression extends CaseClass {
-	constructor(inExpr, whatId) {
-		super('DotResolutionExpression');
-		this.inExpr = inExpr;
-		this.whatId = whatId;
-	}
-
-	doCase(fn) {
-		return fn(this.inExpr, this.whatId);
 	}
 }
 
@@ -285,7 +236,6 @@ module.exports = {
 	NumberExpression: num => new NumberExpression(num),
 	IdExpression: id => new IdExpression(id),
 	StringExpression: str => new StringExpression(str),
-	DeleteExpression: expr => new DeleteExpression(expr),
 	ArrayExpression: exprs => new ArrayExpression(exprs),
 	ObjectExpression: bindings => new ObjectExpression(bindings),
 	ObjectBinding: left => right => new ObjectBinding(left, right),
@@ -296,14 +246,9 @@ module.exports = {
 	ArrayDestructure: ids => new ArrayDestructure(ids),
 	ArrowList: params => new ArrowList(params),
 	ArrowExpression: sig => body => new ArrowExpression(sig, body),
-	BracketResolutionExpression: inE => whatE => 
-		new BracketResolutionExpression(inE, whatE),
-	DotResolutionExpression: inE => whatId =>
-		new DotResolutionExpression(inE, whatId),
 	DoBlock: monad => statements => new DoBlock(monad, statements),
 	VarBindingExpression: lvalue => expr => new VarBindingExpression(lvalue, expr),
 	DoBindingStatement: id => expr => new DoBindingStatement(id, expr),
-	FunctionApplicationExpression: expr => args => new FunctionApplicationExpression(expr, args),
 	BinaryOperatorExpression: o => l => r => new BinaryOperatorExpression(o, l, r),
 	UnaryOperatorExpression: o => e => new UnaryOperatorExpression(o, e),
 	IfElseBlock: c => t => f => new IfElseBlock(c, t, f),

@@ -1,13 +1,12 @@
 const P = require('../parser');
 const {
-	DeleteExpression, ArrayExpression, ObjectExpression,
+	ArrayExpression, ObjectExpression,
 	IdBinding, ObjectBinding, SingleMember, MemberRenaming,
 	ObjectDestructure, ArrayDestructure, ArrowList, 
 	ArrowExpression, IdExpression, StringExpression,
-	NumberExpression, BracketResolutionExpression, DotResolutionExpression,
-	VarBindingExpression, DoBindingStatement, DoBlock,
-	FunctionApplicationExpression, BinaryOperatorExpression,
-	UnaryOperatorExpression, BooleanExpression, IfElseBlock
+	NumberExpression, VarBindingExpression, DoBindingStatement,
+	DoBlock, BinaryOperatorExpression, UnaryOperatorExpression,
+	BooleanExpression, IfElseBlock
 } = require('./doast.js');
 
 /**
@@ -447,6 +446,7 @@ const parseExpr = P.runParser(exprBlock, false);
 const parseDo = P.runParser(doBlock, false);
 
 module.exports = {
+	expr,
 	parse,
 	parseExpr,
 	parseDo,
