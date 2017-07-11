@@ -41,6 +41,7 @@ grammar[">>="] = "BindOperator";
 grammar[">=>"] = "KleisiOperator";
 grammar[">>>"] = "UnsignedRightShift";
 grammar[">>"] = "RightShift";
+grammar["<\\$>"] = "MapOperator";
 grammar["<\\|>"] = "AlternativeOperator";
 grammar["<\\*>"] = "ApplicativeOperator";
 grammar["<\\*"] = "LeftSeqOperator";

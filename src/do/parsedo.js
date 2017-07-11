@@ -83,12 +83,19 @@ const altop = operator('AlternativeOperator');
 const appop = operator('ApplicativeOperator');
 const lseqop = operator('LeftSeqOperator');
 const rseqop = operator('RightSeqOperator');
+const mapop = operator('MapOperator');
 const _return = operator('Return');
 const number = token('Number').map(Number);
 const identifier = token('Identifier');
 const string = token('String');
 
 /* Parse Base Values */
+//parse primitive expressions
+const idExpr = identifier.map(IdExpression)
+const numberExpr = number.map(NumberExpression)
+const stringExpr = string.map(StringExpression)
+const booleanExpr = _true.or(_false).map(BooleanExpression);
+
 
 //parse an array expression
 const array = P.recursive(() =>
@@ -137,7 +144,7 @@ const arrayDestructure = identifier
 //parse a parameter of an arrow function
 const arrowParam = objectDestructure
 	.or(arrayDestructure)
-	.or(identifier);
+	.or(idExpr);
 
 //parse the parameter list of an arrow function
 const arrowList = arrowParam
@@ -145,7 +152,7 @@ const arrowList = arrowParam
 	.wrap(lparen, rparen)
 	.map(ArrowList);
 //single parameter arrow function
-const arrowId = identifier.map(x => [x]).map(ArrowList);
+const arrowId = idExpr.map(x => [x]).map(ArrowList);
 
 //parse an arrow function signature
 const arrowSignature = arrowId.or(arrowList);
@@ -159,11 +166,6 @@ const arrowFunction = P.recursive(() =>
 	 .memoize(true, 5)
 );
 
-//parse primitive expressions
-const idExpr = identifier.map(IdExpression)
-const numberExpr = number.map(NumberExpression)
-const stringExpr = string.map(StringExpression)
-const booleanExpr = _true.or(_false).map(BooleanExpression);
 
 //the base value parser
 const value = P.recursive(() =>
@@ -320,7 +322,6 @@ const ops = [
 		PreDecrement: minusminus,
 		PreIncrement: plusplus,
 		Delete: _delete,
-		Return: _return,
 	})},
 	{type: infixRight, ops: operators({
 		Exponentiation: asterisk.then(asterisk)
@@ -360,10 +361,12 @@ const ops = [
 		ApplicativeOperator: appop,
 		LeftSeqOperator: lseqop,
 		RightSeqOperator: rseqop,
+		MapOperator: mapop,
 	})},
 	{type: infixLeft, ops: altop},
 	{type: infixLeft, ops: bindop},
 	{type: infixRight, ops: kleisiop},
+	{type: prefix, ops: _return.result('ReturnM')},
 ];
 
 //parses expressions that can appear within

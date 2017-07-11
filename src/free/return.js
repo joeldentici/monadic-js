@@ -44,6 +44,15 @@ class Return_ extends CaseClass {
 	}
 
 	/**
+	 *	chain :: Free f a -> (a -> Free f b) -> Free f b
+	 *
+	 *	Alias for bind. Provided for fantasy-land compliance.
+	 */
+	chain(f) {
+		return this.bind(f);
+	}
+
+	/**
 	 *	doCase :: Free f a -> (a -> b) -> b
 	 *
 	 *	Apply the function to the value contained

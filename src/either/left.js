@@ -38,6 +38,15 @@ class Left extends CaseClass {
 	}
 
 	/**
+	 *	chain :: Left c -> (a -> Either c b) -> Left c
+	 *
+	 *	Alias for bind. Provided for fantasy-land compliance.
+	 */
+	chain(fn) {
+		return this.bind(fn);
+	}
+
+	/**
 	 *	doCase :: Left a -> (a -> b) -> b
 	 *
 	 *	Applies the function to the value in the

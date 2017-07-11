@@ -15,11 +15,11 @@ exports.Just = require('./just.js');
 exports.Nothing = require('./nothing.js');
 
 /**
- *	unit :: a -> Just a
+ *	unit/of :: a -> Just a
  *
  *	Puts a value into Maybe context.
  */
-exports.unit = exports.Just;
+exports.of = exports.unit = exports.Just;
 
 /**
  *	nullable :: a -> Maybe a

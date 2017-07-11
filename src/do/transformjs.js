@@ -1,8 +1,8 @@
 const Lexer = require('./lexer.js');
 const {expr} = require('./parsedo.js');
-const analyze = require('../analyzedo.js');
-const transform = require('../transformdo.js');
-const generate = require('../generate.js');
+const analyze = require('./analyzedo.js');
+const transform = require('./transformdo.js');
+const generate = require('./generatedo.js');
 const [grammar, mappers] = require('./lexical-grammar.js');
 const P = require('../parser');
 const Either = require('../either');

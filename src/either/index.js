@@ -15,8 +15,8 @@ exports.Left = require('./left.js');
 exports.Right = require('./right.js');
 
 /**
- *	unit :: a -> Right a
+ *	unit/of :: a -> Right a
  *
  *	Puts a value into Either context.
  */
-exports.unit = exports.Right;
+exports.of = exports.unit = exports.Right;

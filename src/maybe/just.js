@@ -40,6 +40,15 @@ class Just extends CaseClass {
 	}
 
 	/**
+	 *	chain :: Just a -> (a -> Maybe b) -> Maybe b
+	 *
+	 *	Alias for bind. Provided for fantasy-land compliance.
+	 */
+	chain(fn) {
+		return this.bind(fn);
+	}
+
+	/**
 	 *	doCase :: Just a -> (a -> b) -> b
 	 *
 	 *	Apply the function to the value contained

@@ -18,12 +18,12 @@ exports.Free = require('./free.js');
 exports.Return = require('./return.js');
 
 /**
- *	unit :: a -> Free f a
+ *	unit/of :: a -> Free f a
  *
  *	Puts a value into the Free monad over
  *	a functor.
  */
-exports.unit = exports.Return;
+exports.of = exports.unit = exports.Return;
 
 /**
  *	liftF :: f a -> Free f a

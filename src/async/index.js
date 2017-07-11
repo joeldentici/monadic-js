@@ -108,6 +108,16 @@ class Async {
 	}
 
 	/**
+	 *	of :: a -> Async () a
+	 *
+	 *	Alias for unit. Provided for fantasy-land
+	 *	compliance.
+	 */
+	static of(v) {
+		return this.unit(v);
+	}
+
+	/**
 	 *	fail :: a -> Async a ()
 	 *
 	 *	Returns an Async computation that failed

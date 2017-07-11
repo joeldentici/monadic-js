@@ -32,6 +32,15 @@ class Nothing extends CaseClass {
 	}
 
 	/**
+	 *	chain :: Nothing -> (a -> Maybe b) -> Nothing
+	 *
+	 *	Alias for bind. Provided for fantasy-land compliance.
+	 */
+	chain(fn) {
+		return this.bind(fn);
+	}
+
+	/**
 	 *	doCase :: Nothing -> (() -> b) -> b
 	 *
 	 *	Applies the function

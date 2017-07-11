@@ -1,7 +1,6 @@
-const Lexer = require('./lexer.js');
-const [lexicalGrammar, mappers] = require('./lexical-grammar.js');
-const {parse, parseExpr, parseDo} = require('./parsedo.js');
-const P = require('../parser');
+const transformDo = require('./transformjs.js');
+const Module = require('module');
+const fs = require('fs');
 
 
 /**
@@ -22,65 +21,48 @@ const P = require('../parser');
  *	write a simple source-to-source compiler if you prefer that.
  */
 
+
+
+module.exports = function() {
+	console.log('Loading do notation and expression extensions...');
+
+	Module._extensions['.js'] = function(module, filename) {
+		const source = fs.readFileSync(filename, 'utf8');
+
+		const output = transformDo(source);
+
+		output.case({
+			Right: code => module._compile(code, filename),
+			Left: err => {
+				console.error('Could not process ' + filename);
+				console.error(err);
+				process.exit();
+			}
+		});
+	}
+
+	console.log('Loaded do notation and expression extensions!');
+}
+
+
+
+
+
+
+function test() {
+
+const Lexer = require('./lexer.js');
+const [lexicalGrammar, mappers] = require('./lexical-grammar.js');
+const {expr} = require('./parsedo.js');
+const P = require('../parser');
+const transform = require('./transformdo.js');
+const generate = require('./generatedo.js');
+
 const lexer = new Lexer(lexicalGrammar, mappers);
 
 
 function lex(input) {
 	return lexer.lex(input);
-}
-
-/*
-function parseJS(tokens) {
-	const scanner = new Scanner(tokens);
-
-	return jsParser.parse(scanner);
-}
-
-function generateJS(expr, d) {
-	return expr.case({
-		'JS': statements => statements.map(e => generateJS(e, d)).join("\n"),
-		'JSBlock': (header, statements, semi) => 
-			generateJS(header, d) + '{\n' 
-			+ statements.map(e => generateJS(e, d + 1)).join("\n") 
-			+ '\n' + "\t".repeat(d) + `}${semi ? ';' : ''}\n`,
-		'JSBlockHeader': tokens =>
-			"\t".repeat(d) + tokens.map(t => t.__type__ ? generateJS(t, d) : t.value).join(''),
-		'JSStatement': tokens =>
-			"\t".repeat(d) + tokens.map(t => t.__type__ ? generateJS(t, d) : t.value).join('') + ';',
-	});
-}
-
-function prettyJS(input) {
-	return generateJS(parseJS(lex(input)), 0);
-}
-
-function generate(expr, d = 0) {
-
-}
-
-/**
- *	transform :: string -> string
- *
- *	Transforms JS source code, de-sugaring
- *	do-blocks into monadic binds.
- *
- *	TODO: Add analysis step to determine when
- *	applicative composition can be used instead
- *	of monadic composition.
- */
-/*function transform(input) {
-	return generate(parseJS(lex(input)));
-}*/
-
-function getErrorSource(tokens, token, context = 30) {
-	const start = Math.max(0, token.index - context);
-	const end = start + context;
-
-	const msgTokens = tokens.slice(start, end);
-
-	const msg = tokens.map(t => t.value).join('');
-
-	return msg;
 }
 
 function tester(parse) {
@@ -98,12 +80,9 @@ function tester(parse) {
 	}
 }
 
-
-
-function test() {
-
-
+const parse = P.runParser(expr.map(e => generate(transform(e))), false);
 const testParse = tester(parse);
+const testParse2 = tester(P.runParser(expr, false));
 /*
 console.log(testParse('5'));
 
@@ -214,7 +193,24 @@ console.log(testParse('true + false'));
 
 //console.log(testParse('(x >=> f)(a) >>= 7'));
 
-console.log(testParse(`if (x < 5) do Async { x <- 5 return true } else false`))
+//console.log(testParse(`if (x < 5) do Async { x <- 5 return true } else false`))
+
+
+//console.log(testParse('a.b.c'));
+
+//console.log(testParse('expr { a <$> (b <|> d) <*> c }'));
+//console.log(testParse('abc(def, ghi)'));
+console.log(transformJS(`do Async {
+	a <- b
+	c <- d
+	f <- do Array {
+		a <- [1,2,3]
+		b <- [3,4,5]
+		return a * b
+	}
+	return [a + c].concat(f)
+}`))
+//console.log(testParse('return a'));
 
 /*
 console.log(testParse('(a => a)([1,2,3])'));
@@ -247,4 +243,4 @@ const object2 = '{ 99: "ey" }';
 console.log(testParse(object2));*/
 }
 
-test();
+//test();

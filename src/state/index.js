@@ -62,6 +62,15 @@ class State_ {
 			return [f(r), s2];
 		})
 	}
+
+	/**
+	 *	chain :: State s a -> (a -> State s b) -> State s b
+	 *
+	 *	Alias for bind. Used for fantasy-land compliance.
+	 */
+	chain(k) {
+		return this.bind(k);
+	}
 }
 
 /**
@@ -73,13 +82,13 @@ class State_ {
 const State = module.exports = x => new State_(x);
 
 /**
- *	unit :: a -> State s a
+ *	unit/of :: a -> State s a
  *
  *	Puts a value into a stateful context.
  *
  *	Does not change the state.
  */
-State.unit = x => State(s => [x, s]);
+State.of = State.unit = x => State(s => [x, s]);
 
 /**
  *	get :: State s s
