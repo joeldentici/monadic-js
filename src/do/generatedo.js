@@ -73,6 +73,7 @@ function generateObject(bindings) {
 const unaryOpText = {
 	Return: e => 'return ' + e,
 	Delete: e => 'delete ' + e,
+	TypeOf: e => 'typeof ' + e,
 	PostDecrement: e => e + '--',
 	PostIncrement: e => e + '++',
 	Negate: e => '-' + e,

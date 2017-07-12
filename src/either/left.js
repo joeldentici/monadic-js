@@ -57,4 +57,6 @@ class Left extends CaseClass {
 	}
 }
 
-module.exports = (a) => new Left(a);
+module.exports.constructLeft = (a) => new Left(a);
+
+module.exports.Left = Left;

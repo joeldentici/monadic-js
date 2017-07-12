@@ -90,6 +90,7 @@ const rseqop = operator('RightSeqOperator');
 const mapop = operator('MapOperator');
 const _return = operator('Return');
 const _guard = operator('Guard');
+const _typeof = operator('TypeOf');
 const number = token('Number').map(Number);
 const identifier = token('Identifier');
 const string = token('String');
@@ -327,6 +328,7 @@ const ops = [
 		PreDecrement: minusminus,
 		PreIncrement: plusplus,
 		Delete: _delete,
+		TypeOf: _typeof,
 	})},
 	{type: infixRight, ops: operators({
 		Exponentiation: asterisk.then(asterisk)
@@ -342,7 +344,6 @@ const ops = [
 	})},
 	{type: infixLeft, ops: operators({
 		LeftShift: leftshift,
-		//RightShift: rightshift,
 		UnsignedRightShift: unsignedrightshift,
 	})},
 	{type: infixLeft, ops: operators({

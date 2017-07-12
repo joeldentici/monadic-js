@@ -52,6 +52,7 @@ grammar["<"] = "LAngle";
 grammar[">"] = "RAngle";
 grammar["true"] = "True";
 grammar["false"] = "False";
+grammar["\\btypeof\\b"] = "TypeOf";
 grammar["\\bin\\b"] = "In";
 grammar["\\binstanceof\\b"] = "InstanceOf";
 grammar["\\belse\\b"] = "Else";
