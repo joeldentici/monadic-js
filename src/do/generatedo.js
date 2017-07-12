@@ -108,7 +108,7 @@ const binaryOpText = {
 	BitXOR: '^',
 	BitOR: '|',
 	LogicalAND: '&&',
-	LogicalOR: '||'
+	LogicalOR: '||',
 };
 
 function generateBinary(op, left, right) {

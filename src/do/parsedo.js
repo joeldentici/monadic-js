@@ -216,20 +216,20 @@ function topLevel(_, nextParser) {
 
 	const memberAccess = P.seq(
 		dot.result('MemberAccess'),
-		nextParser
+		idExpr
 	);
 
-	const computedMemberAccess = P.seq(
+	const computedMemberAccess = P.recursive(() => P.seq(
 		lbracket.result('ComputedMemberAccess'),
-		nextParser,
+		expr.or(value),
 		rbracket
-	);
+	));
 
-	const functionApplication = P.seq(
+	const functionApplication = P.recursive(() => P.seq(
 		lparen.result('FunctionApplication'),
-		nextParser.sepBy(comma),
+		expr.sepBy(comma),
 		rparen
-	);
+	));
 
 	const ops = memberAccess
 		.or(computedMemberAccess)
@@ -402,7 +402,7 @@ const expr = operatorParser.trim(ignored).memoize(false);
 
 /* Parse do bindings */
 //a regular variable binding
-const lvalue = idExpr;
+const lvalue = idExpr.or(objectDestructure).or(arrayDestructure);
 const varBinding = P.recursive(() =>
 	P.of(VarBindingExpression)
 	 .app(lvalue)
