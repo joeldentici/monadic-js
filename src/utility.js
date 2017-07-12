@@ -24,6 +24,15 @@
  *	});
  *	</pre>
  *
+ *	Note: It is recommended that you use the
+ *	do-notation language extension provided,
+ *	instead of this. Using this weird generator
+ *	fu can lead to problems since generators cannot
+ *	be reused, but a do-notation block is supposed
+ *	to be a value semantically, which means it should
+ *	be able to be reused. The generator approach also
+ *	cannot accommodate monads like the list monad that
+ *	apply their bound function more than once.
  */
 const doM = exports.doM = function(genFn) {
 	const gen = genFn();

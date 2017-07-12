@@ -342,7 +342,7 @@ const ops = [
 	})},
 	{type: infixLeft, ops: operators({
 		LeftShift: leftshift,
-		RightShift: rightshift,
+		//RightShift: rightshift,
 		UnsignedRightShift: unsignedrightshift,
 	})},
 	{type: infixLeft, ops: operators({
@@ -369,7 +369,10 @@ const ops = [
 		MapOperator: mapop,
 	})},
 	{type: infixLeft, ops: altop},
-	{type: infixLeft, ops: bindop},
+	{type: infixLeft, ops: operators({
+		BindOperator: bindop,
+		SequenceOperator: rightshift,
+	})},
 	{type: infixRight, ops: kleisiop},
 	{type: prefix, ops: operators({
 		ReturnM: _return,

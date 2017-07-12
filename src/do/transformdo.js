@@ -200,6 +200,7 @@ const leftAccess = {
 	ApplicativeOperator: 'app',
 	LeftSeqOperator: 'seqL',
 	RightSeqOperator: 'seqR',
+	SequenceOperator: 'chain',
 };
 
 const rightAccess = {
@@ -221,10 +222,17 @@ function transformBinaryExpr(monad) {
 				(transform(left, monad))
 				(IdExpression(leftAccess[op]));
 
+			const arg = transform(right, monad);
+
+			const arg2 = op === 'SequenceOperator' ?
+			ArrowExpression(
+				ArrowList([IdExpression('_')]))
+				(arg) : arg;
+
 			const app = BinaryOperatorExpression(
 				'FunctionApplication')
 				(fn)
-				([transform(right, monad)]);
+				([arg2]);
 
 			return app;
 		}

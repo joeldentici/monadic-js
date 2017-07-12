@@ -67,7 +67,7 @@ Array.prototype.foldl = function(f, z) {
 	if (this.length === 0)
 		return z;
 	else
-		return f(this.slice(1).foldl(f, z), this[1]);
+		return f(this.slice(1).foldl(f, z), this[0]);
 }
 
 /* Export submodules */
