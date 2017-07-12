@@ -2,6 +2,7 @@
 const CaseClass = require('js-helpers').CaseClass;
 const Return = module.exports = (a) => new Return_(a);
 const Free = require('./free.js');
+const Async = require('../async');
 
 /**
  *	Monadic.Free.Return
@@ -74,5 +75,18 @@ class Return_ extends CaseClass {
 			Return: b => Return(a(b)),
 			Free: mb => Free(mb.map(x => x.map(a))),
 		});
+	}
+
+	/**
+	 *	alt :: Free f a -> Free f b -> Free f (a | b)
+	 *
+	 *	This is a really bad way to get an alternative instance,
+	 *	but we essentially just force using Async's try and catch.
+	 *
+	 *	Hacky, sure, but it is useful for DSLs that are going to be
+	 *	interpreted to Async anyway.
+	 */
+	alt(o) {
+		return Async.try(this).catch(e => o);
 	}
 }
