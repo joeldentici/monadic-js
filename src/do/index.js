@@ -23,8 +23,22 @@ const path = require('path');
  */
 
 
-
-module.exports = function(verbose = false) {
+/**
+ *	loadDo :: (string, bool) -> ()
+ *
+ *	Hooks into the node module loader and registers the
+ *	specified extension to be pre-compiled by the do-notation
+ *	transformer.
+ *
+ *	The default extension used when none is specified is '.ejs'
+ *
+ *	The second argument can be used to get verbose output from
+ *	this function:
+ *		Level 0 - Errors only
+ *		Level 1 - Level 0 + Loading messages & compilation time
+ *		Level 2 - Level 1 + Compilation output
+ */
+module.exports = function(ext = '.ejs', verbose = 0) {
 	verbose && console.log('Loading do notation and expression extensions...');
 
 	function processFile(filename) {
@@ -38,6 +52,7 @@ module.exports = function(verbose = false) {
 			Right: code => {
 				const end = Date.now() / 1000;
 				verbose && console.log("Compiled " + filename, 'in', end - start, 'seconds');
+				verbose >= 2 && console.log(code);
 				return code;
 			},
 			Left: err => {
@@ -48,8 +63,8 @@ module.exports = function(verbose = false) {
 		});		
 	}
 
-	Module._extensions['.ejs'] = function(module, filename) {
-		const jsFileName = '.' + path.basename(filename, '.ejs') + '.js';
+	Module._extensions[ext] = function(module, filename) {
+		const jsFileName = '.' + path.basename(filename, ext) + '.js';
 		const jsFilePath = path.join(
 			path.dirname(filename),
 			jsFileName

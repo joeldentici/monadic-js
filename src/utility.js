@@ -5,7 +5,8 @@
  *	written by Joel Dentici
  *	on 6/20/2017
  *
- *	Utility functions for working with monads.
+ *	Utility functions for working with monads, applicatives,
+ *	alternatives, and just functional stuff in general.
  */
 
 /**
@@ -36,14 +37,15 @@ const doM = exports.doM = function(genFn) {
 	return step();
 }
 
-//TODO: This should be aliased to traverse for Traversables
-//once the Traversable and Foldable definitions are ready
 /**
  *	mapM :: Monad m => Type m -> (a -> m b) -> [a] -> m [b]
  *
  *	Maps a monadic function over a list of values, sequencing each
  *	application over the list, and collecting the results into a new
  *	list, which is lifted into the monadic type provided.
+ *
+ *	TODO: Replace usages of this with _mapM, then rename
+ *	_mapM to mapM and delete this function.
  */
 const mapM = exports.mapM = function(monad, fn, lst) {
 	if (lst.length === 0) {
@@ -55,12 +57,6 @@ const mapM = exports.mapM = function(monad, fn, lst) {
 				[x].concat(xs)
 			)
 		);
-/*
-		return doM(function*() {
-			const fst = yield fn(lst[0]);
-			const rest = yield mapM(monad, fn, lst.slice(1));
-			return monad.unit([fst].concat(rest));
-		});*/
 	}
 }
 
@@ -99,4 +95,80 @@ const guard = exports.guard = function(cond, alt) {
 		return alt.of();
 	else
 		return alt.zero();
+}
+
+/**
+ *	constant :: a -> () -> a
+ *
+ *	When applied to a value, returns a function
+ *	that will always return that value, regardless
+ *	of what it is applied to.
+ */
+const constant = exports.constant = x => () => x;
+
+/**
+ *	id :: a -> a
+ *
+ *	Always returns the value it is applied to.
+ */
+const id = exports.id = x => x;
+
+
+/**
+ *	foldrM :: Foldable t, Monad m => (Type m, (a, b) -> m b) -> b -> t a -> m b
+ *
+ *	Monadic fold over a structure, from right to left.
+ */
+const foldrM = exports.foldrM = (monad, f) => z0 => xs => {
+	const f2 = (k, x) => z => f(x, z).chain(k);
+
+	return xs.foldl(f2, monad.of)(z0);
+}
+
+/**
+ *	foldlM :: Foldable t, Monad m => (Type m, (b, a) -> m b) -> b -> t a -> m b
+ *
+ *	Monadic fold over a structure, from left to right.
+ */
+const foldlM = exports.foldlM = (monad, f) => z0 => xs => {
+	const f2 = (x, k) => z => f(z, x).chain(k);
+
+	return xs.foldr(f2, monad.of)(z0);
+}
+
+/**
+ *	filterM :: Consable t, Monad m => (Type m, (a -> m bool)) -> t a -> m (t a)
+ *
+ *	Filters a specified list by using a predicate with results
+ *	in the specified monad. Returns the filtered list in the
+ *	specified monad.
+ */
+const filterM = exports.filterM = (monad, predM) => xs => {
+	const t = xs.constructor;
+
+	const z0 = t.empty;
+
+	return foldlM(monad, (acc, v) => {
+		return predM(v)
+			.map(b => b ? t.cons(v, acc) : acc);
+	})(z0)(xs);
+}
+
+/**
+ *	_mapM :: Consable t, Monad m => (Type m, (a -> m b)) -> t a -> m (t b)
+ *
+ *	mapM defined to work over any Consable structure.
+ *
+ *	We can alternatively define it as traverse on a
+ *	Traversable structure (Foldable + Functor).
+ */
+const _mapM = exports._mapM = (monad, f) => xs => {
+	const t = xs.constructor;
+
+	const z0 = t.empty;
+
+	return foldlM(monad, (acc, v) => {
+		return f(v)
+			.map(v2 => t.cons(v2, acc));
+	})(z0)(xs);
 }

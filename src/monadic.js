@@ -54,6 +54,21 @@ Array.empty = [];
 Array.prototype.alt = function(other) {
 	return [].concat(this, other);
 }
+Array.cons = function(x, xs) {
+	return [x].concat(xs);
+}
+Array.prototype.foldr = function(f, z) {
+	if (this.length === 0)
+		return z;
+	else
+		return f(this[0], this.slice(1).foldr(f, z));
+}
+Array.prototype.foldl = function(f, z) {
+	if (this.length === 0)
+		return z;
+	else
+		return f(this.slice(1).foldl(f, z), this[1]);
+}
 
 /* Export submodules */
 exports.Free = require('./free');
