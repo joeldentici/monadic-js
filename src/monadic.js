@@ -57,6 +57,9 @@ Array.prototype.alt = function(other) {
 Array.cons = function(x, xs) {
 	return [x].concat(xs);
 }
+Array.append = function(x, xs) {
+	return [].concat(xs, x);
+}
 Array.prototype.foldr = function(f, z) {
 	if (this.length === 0)
 		return z;

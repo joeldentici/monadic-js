@@ -159,7 +159,7 @@ const filterM = exports.filterM = (monad, predM) => xs => {
 
 	return foldlM(monad, (acc, v) => {
 		return predM(v)
-			.map(b => b ? t.cons(v, acc) : acc);
+			.map(b => b ? t.append(v, acc) : acc);
 	})(z0)(xs);
 }
 
@@ -178,6 +178,6 @@ const _mapM = exports._mapM = (monad, f) => xs => {
 
 	return foldlM(monad, (acc, v) => {
 		return f(v)
-			.map(v2 => t.cons(v2, acc));
+			.map(v2 => t.append(v2, acc));
 	})(z0)(xs);
 }
