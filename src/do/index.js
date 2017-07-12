@@ -1,6 +1,7 @@
 const transformDo = require('./transformjs.js');
 const Module = require('module');
 const fs = require('fs');
+const path = require('path');
 
 
 /**
@@ -23,25 +24,65 @@ const fs = require('fs');
 
 
 
-module.exports = function() {
-	console.log('Loading do notation and expression extensions...');
+module.exports = function(verbose = false) {
+	verbose && console.log('Loading do notation and expression extensions...');
 
-	Module._extensions['.js'] = function(module, filename) {
+	function processFile(filename) {
 		const source = fs.readFileSync(filename, 'utf8');
+		verbose && console.log("Compiling " + filename);
+		const start = Date.now() / 1000;
 
 		const output = transformDo(source);
 
-		output.case({
-			Right: code => module._compile(code, filename),
+		return output.case({
+			Right: code => {
+				const end = Date.now() / 1000;
+				verbose && console.log("Compiled " + filename, 'in', end - start, 'seconds');
+				return code;
+			},
 			Left: err => {
-				console.error('Could not process ' + filename);
+				console.error('Could not compile ' + filename);
 				console.error(err);
 				process.exit();
 			}
-		});
+		});		
 	}
 
-	console.log('Loaded do notation and expression extensions!');
+	Module._extensions['.ejs'] = function(module, filename) {
+		const jsFileName = '.' + path.basename(filename, '.ejs') + '.js';
+		const jsFilePath = path.join(
+			path.dirname(filename),
+			jsFileName
+		);
+
+		//stat both the .ejs file and the cached copy
+		const ejsStats = fs.statSync(filename);
+
+		let jsStats;
+		try {
+			jsStats = fs.statSync(jsFilePath);
+		}
+		catch (e) {
+			jsStats = {mtime: 0};
+		}
+
+		//if the .ejs file has been touched since we created
+		//the cached copy, we need to recompile
+		if (ejsStats.mtime > jsStats.mtime) {
+			const code = processFile(filename);
+			fs.writeFileSync(jsFilePath, code);
+			module._compile(code, filename);
+		}
+		//yay we can quickly load the cached copy
+		else {
+			verbose && console.log("Loading cached copy of " + filename);
+			const code = fs.readFileSync(jsFilePath, 'utf8');
+			verbose && console.log("Loaded cached copy of " + filename);
+			module._compile(code, filename);
+		}
+	}
+
+	verbose && console.log('Loaded do notation and expression extensions!');
 }
 
 

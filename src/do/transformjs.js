@@ -43,6 +43,35 @@ const transformExpr = expr.map(ast => generate(transform(analyze(ast))));
 // transformBlock :: ([Token], int) -> Either ParseError (ParseResult string)
 const transformBlock = P.runParser(transformExpr, false);
 
+const skipped = new Set([
+	'Whitespace',
+	'Comment',
+	'MultiLineComment'
+]);
+/**
+ *	isDo :: [Token] -> int -> bool
+ *
+ *	Checks if we are at a possible do block.
+ *
+ *	We check for a "do" followed by an identifier
+ *	skipping any whitespace and comments. This is
+ *	to ensure that we don't accidentally consider
+ *	a do-while loop to be a do-notation block.
+ */
+function isDo(tokens, pos) {
+	if (tokens[pos].lexeme !== 'Do')
+		return false;
+	pos++;
+
+	while (pos < tokens.length
+		&& skipped.has(tokens[pos].lexeme))
+		pos++;
+
+	if (tokens[pos].lexeme !== 'Identifier')
+		return false;
+
+	return true;
+}
 
 /**
  *	transformJS :: string -> Either string string
@@ -65,13 +94,13 @@ const transformJS = module.exports = function(source) {
 	while (pos < tokens.length) {
 		token = tokens[pos];
 
-		if (token.lexeme === 'Do' || token.lexeme === 'Expr') {
+		if (isDo(tokens, pos) || token.lexeme === 'Expr') {
 			const res = transformBlock(tokens, pos);
 
 			const error = res.case({
 				Right: ({pos: pos2, val}) => {
 					pos = pos2;
-					output += val;
+					output += val + ';';
 					return null;
 				},
 				Left: err => P.showError(err)(tokens),

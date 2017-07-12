@@ -131,10 +131,6 @@ function createDoStatement(statements) {
  *	
  */
 function transformDoBlock(monad, statements) {
-	const start = DoBindingStatement('_')(getReturn(monad));
-
-	const newStatements = [start].concat(statements);
-
 	const statement = createDoStatement(statements);
 
 	const chained = transform(statement, monad);
@@ -147,10 +143,6 @@ function transformDoBlock(monad, statements) {
 		'FunctionApplication')
 		(Parened(fn))
 		([]);
-
-	//console.log(JSON.stringify(p, null, 2));
-
-	//process.exit();
 
 	return app;
 }
@@ -187,17 +179,12 @@ function transformUnaryExpr(monad) {
 	return function(op, expr) {
 		if (op === 'ReturnM' && monad) {
 			return getReturn(monad, expr);
-			/*const fn = BinaryOperatorExpression(
-				'MemberAccess')
-				(IdExpression(monad))
-				(IdExpression('of'));
-
-			const app = BinaryOperatorExpression(
+		}
+		else if (op === 'GuardM' && monad) {
+			return BinaryOperatorExpression(
 				'FunctionApplication')
-				(fn)
-				([transform(expr, monad)]);
-
-			return app;*/
+				(IdExpression('guard'))
+				([transform(expr, monad), IdExpression(monad)]);
 		}
 		else {
 			return UnaryOperatorExpression(op)(transform(expr, monad));

@@ -58,6 +58,7 @@ grammar["\\belse\\b"] = "Else";
 grammar["\\bif\\b"] = "If";
 grammar["\\bdelete\\b"] = "Delete";
 grammar["\\breturn\\b"] = "Return";
+grammar["\\bguard\\b"] = "Guard";
 grammar["[\\+\\-]?[0-9][a-z0-9\\.]*"] = "Number";
 grammar["\\*"] = "Asterisk";
 grammar["\\+\\+"] = "PlusPlus";

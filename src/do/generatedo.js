@@ -106,8 +106,8 @@ const binaryOpText = {
 	BitAND: '&',
 	BitXOR: '^',
 	BitOR: '|',
-	LogAND: '&&',
-	LogOR: '||'
+	LogicalAND: '&&',
+	LogicalOR: '||'
 };
 
 function generateBinary(op, left, right) {
@@ -126,6 +126,7 @@ function generateBinary(op, left, right) {
 		return generate(left) + '[' + generate(right) + ']';
 	}
 	else {
-		console.log("WTF", op);
+		console.error("I forgot this operator: ", op);
+		process.exit();
 	}
 }

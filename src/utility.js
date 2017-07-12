@@ -64,12 +64,39 @@ const mapM = exports.mapM = function(monad, fn, lst) {
 	}
 }
 
-/*const mapM = exports.mapM = function(monad, fn, lst) {
-	const actions = lst.map(fn);
+/**
+ *	when :: Applicative f => (bool, f ()) -> f ()
+ *
+ *	Performs the specified action when the specified
+ *	condition is true.
+ */
+const when = exports.when = function(cond, action) {
+	if (cond)
+		return action;
+	else
+		return action.constructor.of();
+}
 
-	return actions.reduce(
-		(acc, action) => acc.bind(acc =>
-			action.map(val => acc.concat(val))),
-		monad.unit([])
-	);
-}*/
+/**
+ *	unless :: Applicative f => (bool, f ()) -> f ()
+ *
+ *	Performs the specified action when the specified
+ *	condition is false.
+ */
+const unless = exports.unless = function(cond, action) {
+	return when(!cond, action);
+}
+
+/**
+ *	guard :: Alternative f => (bool, Type f) -> f ()
+ *
+ *	Guards further MonadPlus binding/sequencing when
+ *	the provided condition is false, due to the law
+ *	that empty >>= f = empty
+ */
+const guard = exports.guard = function(cond, alt) {
+	if (cond)
+		return alt.of();
+	else
+		return alt.zero();
+}

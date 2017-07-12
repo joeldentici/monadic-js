@@ -22,10 +22,14 @@ const {
  */
 
 /* Ignore these tokens */
-const ws = P.token(t => t.lexeme === 'Whitespace')('Whitespace').many;
-const comment = P.token(t => t.lexeme === 'Comment')('Comment').many;
-const multiComment = P.token(t => t.lexeme === 'MultiLineComment')('Multi Line Comment').many;
-const ignored = ws.or(comment).or(multiComment);
+//combine into one token parser for speed
+const ignoredTokens = new Set([
+	'Whitespace',
+	'Comment',
+	'MultiLineComment'
+]);
+const ignored = P.token(t => ignoredTokens.has(t.lexeme))('Ignored').many;
+
 
 /* Convenience parser constructors for ignoring above */
 const word = parser => parser.trim(ignored);
@@ -85,6 +89,7 @@ const lseqop = operator('LeftSeqOperator');
 const rseqop = operator('RightSeqOperator');
 const mapop = operator('MapOperator');
 const _return = operator('Return');
+const _guard = operator('Guard');
 const number = token('Number').map(Number);
 const identifier = token('Identifier');
 const string = token('String');
@@ -366,7 +371,10 @@ const ops = [
 	{type: infixLeft, ops: altop},
 	{type: infixLeft, ops: bindop},
 	{type: infixRight, ops: kleisiop},
-	{type: prefix, ops: _return.result('ReturnM')},
+	{type: prefix, ops: operators({
+		ReturnM: _return,
+		GuardM: _guard
+	})},
 ];
 
 //parses expressions that can appear within
