@@ -100,7 +100,7 @@ const transformJS = module.exports = function(source) {
 			const error = res.case({
 				Right: ({pos: pos2, val}) => {
 					pos = pos2;
-					output += val + ';';
+					output += val;
 					return null;
 				},
 				Left: err => P.showError(err)(tokens),
