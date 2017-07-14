@@ -40,6 +40,7 @@ const path = require('path');
  */
 module.exports = function(ext = '.ejs', verbose = 0) {
 	require('../extendFunction.js').addExtensions();
+	require('../extendArray.js').addExtensions();
 
 	verbose && console.log('Loading do notation and expression extensions...');
 
