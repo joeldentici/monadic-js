@@ -18,7 +18,16 @@ class AsyncComputation extends CaseClass {
 	 */
 	constructor(thunk) {
 		super('AsyncComputation');
-		this.thunk = thunk;
+		//always wrap thunk application in try-catch
+		//so we can turn normal throws into Async fails
+		this.thunk = (succ, fail) => {
+			try {
+				return thunk(succ, fail);
+			}
+			catch (e) {
+				fail(e);
+			}
+		};
 	}
 
 	/**
@@ -33,12 +42,25 @@ class AsyncComputation extends CaseClass {
 	}
 
 	/**
-	 *	run :: Async c e a -> Promise a e
+	 *	run :: Async c e a -> ()
+	 *
+	 *	Forks the computation and throws away the results.
+	 *
+	 *	Useful for when you were using the Async results to
+	 *	do side effects that could throw errors in a tap
+	 *	and wanted to catch them using chainFail/catch.
+	 */
+	run() {
+		return this.fork(x => undefined, e => undefined);
+	}
+
+	/**
+	 *	toPromise :: Async c e a -> Promise a e
 	 *
 	 *	This is the same as forking the computation, but
 	 *	you get back a Promise for the result.
 	 */
-	run() {
+	toPromise() {
 		return new Promise((s, f) => this.fork(s, f));
 	}
 
@@ -68,18 +90,27 @@ class AsyncComputation extends CaseClass {
 	}
 
 	/**
-	 *	catch :: Async c e a -> (e -> Async c e2 b) -> Async c e2 b
+	 *	chainFail :: Async c e a -> (e -> Async c e2 b) -> Async c e2 b
 	 *
 	 *	Same as chain/bind but the function is applied when this
 	 *	computation fails.
 	 */
-	catch(f) {
+	chainFail(f) {
 		return new AsyncComputation((succ, fail) => {
 			succ = later(succ);
 			fail = later(fail);
 
 			this.fork(succ, e => f(e).fork(succ, fail));
 		});
+	}
+
+	/**
+	 *	catch :: Async c e a -> (e -> Async c e2 b) -> Async c e2 b
+	 *
+	 *	Alias for chainFail.
+	 */
+	catch(f) {
+		return this.chainFail(f);
 	}
 
 	/**
@@ -97,16 +128,42 @@ class AsyncComputation extends CaseClass {
 	}
 
 	/**
+	 *	tap :: Async c e a -> (a -> ()) -> Async c e a
+	 *
+	 *	Tap into the Async computation at a certain point
+	 *	to perform a side effect. This should be used with
+	 *	care and mainly only by the consumer of an Async computation.
+	 */
+	tap(f) {
+		return this.map(x => {
+			f(x);
+			return x;
+		});
+	}
+
+	/**
 	 *	mapCatch :: Async c e a -> (e -> e2) -> Async c e2 a
 	 *
 	 *	Applies the function to the error of this computation.
 	 */
-	mapCatch(f) {
+	mapFail(f) {
 		return new AsyncComputation((succ, fail) => {
 			succ = later(succ);
 			fail = later(fail);
 
 			this.fork(succ, compose(fail, f));
+		});
+	}
+
+	/**
+	 *	tapFail :: Async c e a -> (e -> ()) -> Async c e a
+	 *
+	 *	Tap for failures.
+	 */
+	tapFail(f) {
+		return this.mapFail(e => {
+			f(e);
+			return e;
 		});
 	}
 

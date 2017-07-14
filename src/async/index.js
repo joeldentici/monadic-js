@@ -1,6 +1,5 @@
 const AsyncComputation = require('./asynccomputation.js');
 const AsyncFirst = require('./asyncfirst.js');
-const Free = require('../free');
 const {all} = require('../utility.js');
 
 /**
@@ -109,16 +108,10 @@ class Async {
 	}
 
 	/**
-	 *	run :: Async c e a -> Promise a e
+	 *	run :: Async c e a -> ()
 	 *
-	 *	Runs the asynchronous computation and
-	 *	returns a promise for the result.
-	 *
-	 *	You can use Async.fork or async.fork as
-	 *	well to get the result or error passed to
-	 *	a continuation, which is probably the better
-	 *	way to do it since you should be eliminating
-	 *	promises anyway.
+	 *	Runs the asynchronous computation, discarding
+	 *	the result.
 	 */
 	static run(comp) {
 		return comp.run();
@@ -132,6 +125,16 @@ class Async {
 	 */
 	static fork(async, succ, fail) {
 		return async.fork(succ, fail);
+	}
+
+	/**
+	 *	toPromise :: Async c e a -> Promise a e
+	 *
+	 *	Forks the computation and returns a promise
+	 *	for its result.
+	 */
+	static toPromise(comp) {
+		return comp.toPromise();
 	}
 
 	/**
@@ -164,7 +167,7 @@ class Async {
 		if (comps.length === 1 && comps[0] instanceof Array)
 			comps = comps[0];
 
-		return all(comps);
+		return all(Async, comps);
 	}
 
 	/**
@@ -204,6 +207,40 @@ class Async {
 	 */
 	static fromPromise(promise) {
 		return Async.await(promise);
+	}
+
+	/**
+	 *	fromEither :: Either e a -> Async () e a
+	 *
+	 *	Creates an Async computation whose result or failure
+	 *	is the value in the specified Either.
+	 */
+	static fromEither(either) {
+		return either.case({
+			Left: e => Async.fail(e),
+			Right: r => Async.of(r),
+		});
+	}
+
+	/**
+	 *	fromMaybe :: Maybe a -> Async () NonExistenceError a
+	 *
+	 *	Creates an Async computation whose result is the
+	 *	value in the Maybe. If the Maybe is Nothing, then
+	 *	the Async computation will result in a NonExistenceError.
+	 */
+	static fromMaybe(maybe) {
+		return maybe.case({
+			Nothing: () => Async.fail(
+				new NonExistenceError('Async.fromMaybe')),
+			Just: r => Async.of(r),
+		});
+	}
+}
+
+class NonExistenceError extends Error {
+	constructor(method) {
+		super(method + ': Received Maybe.Nothing');
 	}
 }
 
