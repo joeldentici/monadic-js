@@ -169,57 +169,24 @@ const mapM = exports.mapM = (monad, f) => xs => {
 }
 
 /**
- *	collect :: int=n -> (a -> a -> ... -> [a]).length=n+1
- *
- *	Constructs a function that collects n arguments into
- *	a list. This is used with Applicative application to
- *	collect results in parallel.
- */
-const collect = exports.collect = function(n) {
-	//creates a new "collect context" and calls add the
-	//first time
-	return function(x) {
-		//counter to know when there is nothing left to apply
-		let i = n;
-		//the list of arguments that are received
-		const xs = [];
-
-		function add(x) {
-			//this check lets us work with n = 0
-			//although we would never use that for
-			//applicatives (or really much at all
-			//in FP)
-			if (typeof x !== 'undefined') {
-				xs.push(x);
-				i--;
-			}
-
-			//keep "currying" arguments
-			if (i) {
-				return add;
-			}
-			//return all the arguments
-			else {
-				return xs;
-			}
-		}
-
-		return add(x);
-	}
-}
-
-/**
- *	all :: Applicative f => [f a] -> f [a]
+ *	all :: Applicative f => (Type f, [f a]) -> f [a]
  *
  *	Collects the results of a list of applicative
- *	actions into a list.
+ *	actions into a list. This is more efficient than
+ *	mapM (Type f, id), because it uses array push on
+ *	the result list rather than creating intermediate arrays.
+ *
  */
-const all = exports.all = function(xs) {
-	return xs.slice(1)
-		.reduce(
-			(acc, x) => acc.app(x),
-			xs[0].map(collect(xs.length))
-		);
+const all = exports.all = function(type, xs) {
+	const add = y => ys => {
+		ys.push(y);
+		return ys;
+	}
+
+	return xs.reduce(
+		(acc, x) => x.map(add).app(acc),
+		type.of([])
+	);
 }
 
 /**
@@ -228,14 +195,16 @@ const all = exports.all = function(xs) {
  *	Repeats the specified action cnt times and collects
  *	the results into a list.
  */
-const replicateM = exports.replicateM = function(type, cnt, a) {
-	if (cnt <= 0)
-		return type.of([]);
+const replicateM = exports.replicateM = function(type, cnt = 0, a) {
+	const add = x => xs => {
+		xs.push(x);
+		return xs;
+	}
 
-	//doing this iteratively so we don't blow the stack
-	let acc = a.map(collect(cnt));
-	while (--cnt)
-		acc = acc.app(a);
+	let acc = type.of([]);
+
+	while (cnt--)
+		acc = a.map(add).app(acc);
 
 	return acc;
 }
