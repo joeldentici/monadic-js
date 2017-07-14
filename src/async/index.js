@@ -1,8 +1,7 @@
 const AsyncComputation = require('./asynccomputation.js');
-const AsyncHandler = require('./asynchandler.js');
 const AsyncFirst = require('./asyncfirst.js');
 const Free = require('../free');
-const {mapM} = require('../utility.js');
+const {all} = require('../utility.js');
 
 /**
  *	Monadic.Async
@@ -14,22 +13,14 @@ const {mapM} = require('../utility.js');
  *
  *	Unlike Promises, an Async computation is
  *	lazily evaluated, so it won't be executed
- *	immediately.
- *
- *	Async provides an Interpreter to be used
- *	with the Free.createInterpreter function so it
- *	can be used with other Free monads. It maps to
- *	Async, as it is expected that most interpreters
- *	will do the same. Because of this, it essentially
- *	doesn't do anything.
- *
- *	A method called run is also provided to 
- *	interpret an Async into a Promise.
+ *	immediately. Asyncs can be turned into Promises
+ *	by calling "run" on them and Promises can be turned
+ *	into Asyncs by applying Async.fromPromise to them
  */
 
 class Async {
 	/**
-	 *	create :: ((a -> ()) -> (b -> ()) -> ()) -> Async b a
+	 *	create :: ((a -> ()) -> (e -> ()) -> c) -> Async c e a
 	 *
 	 *	Creates an Async computation. Takes a function that
 	 *	accepts two functions, one for a successful computation
@@ -37,36 +28,22 @@ class Async {
 	 *	executed until the Async is ran.
 	 */
 	static create(thunk) {
-		return Free.liftF(new AsyncComputation(thunk, x => x));
+		return new AsyncComputation(thunk);
 	}
 
 	/**
-	 *	catch :: Async b a -> (b -> Async c d) -> Async c d
+	 *	try :: Async c e a -> Async c e a
 	 *
-	 *	Creates an Async handler. This takes an Async computation
-	 *	and an error handler function.
-	 */
-	static catch(asyncVal, handler) {
-		return Free.liftF(new AsyncHandler(asyncVal, handler, x => x));
-	}
-
-	/**
-	 *	try :: Async b a -> Async b a
-	 *
-	 *	Adds a "catch" method to the provided Async computation.
-	 *	This is a convenience method to allow Async.catch to be
-	 *	infix, and make monadic code look more imperative.
+	 *	This method literally doesn't do anything. It is just
+	 *	here to make catching look more imperative by surrounding
+	 *	it with try.
 	 */
 	static try(asyncVal) {
-		asyncVal.catch = function(handler) {
-			return Async.catch(asyncVal, handler);
-		};
-
 		return asyncVal;
 	}
 
 	/**
-	 *	wrap :: (...any -> (b -> c -> ()) -> ()) -> ...any -> Async b c
+	 *	wrap :: ((...any, e -> a -> ()) -> c) -> ...any -> Async c e a
 	 *
 	 *	Wraps a callback taking async function so it becomes a function
 	 *	that returns Async computations.
@@ -85,7 +62,7 @@ class Async {
 	}
 
 	/**
-	 *	wrapPromise :: (...any -> Promise a e) -> ...any -> Async a e
+	 *	wrapPromise :: (...any -> Promise a e) -> ...any -> Async (Promise a e) e a
 	 *
 	 *	Wraps a promise returning async function so it becomes a function
 	 *	that returns Async computations.
@@ -98,17 +75,19 @@ class Async {
 	}
 
 	/**
-	 *	unit :: a -> Async () a
+	 *	unit :: a -> Async () () a
 	 *
 	 *	Puts a value into the context of
 	 *	an Async computation.
 	 */
 	static unit(v) {
-		return Free.unit(v);
+		return Async.create((succ, fail) => {
+			succ(v);
+		});
 	}
 
 	/**
-	 *	of :: a -> Async () a
+	 *	of :: a -> Async () () a
 	 *
 	 *	Alias for unit. Provided for fantasy-land
 	 *	compliance.
@@ -118,50 +97,45 @@ class Async {
 	}
 
 	/**
-	 *	fail :: a -> Async a ()
+	 *	fail :: e -> Async () e ()
 	 *
 	 *	Returns an Async computation that failed
 	 *	for the specified reason.
 	 */
 	static fail(e) {
-		return Async.create((succ, fail) => fail(e));
+		return Async.create((succ, fail) => {
+			fail(e);
+		});
 	}
 
 	/**
-	 *	run :: Async b a -> Promise a b
+	 *	run :: Async c e a -> Promise a e
 	 *
 	 *	Runs the asynchronous computation and
 	 *	returns a promise for the result.
 	 *
-	 *	run only runs the Async on the first application.
-	 *	Any subsequent applications will return the promise
-	 *	from the first application.
+	 *	You can use Async.fork or async.fork as
+	 *	well to get the result or error passed to
+	 *	a continuation, which is probably the better
+	 *	way to do it since you should be eliminating
+	 *	promises anyway.
 	 */
 	static run(comp) {
-		if (!comp.__res__) {
-			const res = comp.case({
-				Free: x => x.case({
-					AsyncComputation: (t, n) => new Promise(t).then(v => Async.run(n(v))),
-					AsyncHandler: (a, h, n) => Async.run(a)
-						.catch(e => Async.run(h(e)))
-						.then(v => Async.run(n(v))),
-					AsyncFirst: (cs, n) => Promise
-						.race(cs.map(c => Async.run(c)))
-						.then(v => Async.run(n(v))),
-					default: () => Promise.reject(new Error(
-						"Expected Async computation, got: " + x.__type__)),
-				}),
-				Return: x => Promise.resolve(x),
-			});
-
-			comp.__res__ = res;
-		}
-
-		return comp.__res__;
+		return comp.run();
 	}
 
 	/**
-	 *	sleep :: int -> Async ()
+	 *	fork :: (Async c b a, (a -> d), (b -> e)) -> c
+	 *
+	 *	Runs the asynchronous computation. Its result
+	 *	will be passed to succ or fail as appropriate.
+	 */
+	static fork(async, succ, fail) {
+		return async.fork(succ, fail);
+	}
+
+	/**
+	 *	sleep :: int -> Async int () ()
 	 *
 	 *	Creates an Async computation that sleeps for the specified
 	 *	timespan in milliseconds and returns no result.
@@ -171,29 +145,41 @@ class Async {
 	}
 
 	/**
-	 *	all :: ...Async e a -> Async e [a]
+	 *	all :: ...Async c e a -> Async c e [a]
 	 *
 	 *	Returns an Async computation whose result
 	 *	combines all the results from the provided
 	 *	Asyncs.
+	 *
+	 *	If any of the Asyncs fail, then the resulting
+	 *	Async will have its error.
+	 *
+	 *	This can be called with an array or rest args.
+	 *
+	 *	There must be at least one computation provided,
+	 *	regardless of how this is called.
 	 */
 	static all(...comps) {
-		return mapM(Async, x => x, comps);
+		//handle calls with an array instead of rest args
+		if (comps.length === 1 && comps[0] instanceof Array)
+			comps = comps[0];
+
+		return all(comps);
 	}
 
 	/**
-	 *	first :: ...Async e a -> Async e a
+	 *	first :: ...Async c e a -> Async c e a
 	 *
 	 *	Returns an Async computation whose result is
 	 *	the result of the first provided computation to
 	 *	finish.
 	 */
 	static first(...comps) {
-		return Free.liftF(new AsyncFirst(comps, x => x));
+		return new AsyncFirst(comps);
 	}
 
 	/**
-	 *	throwE :: e -> Async e ()
+	 *	throwE :: e -> Async () e ()
 	 *
 	 *	Alias of fail
 	 */
@@ -202,65 +188,25 @@ class Async {
 	}
 
 	/**
-	 *	await :: Promise a e -> Async e a
+	 *	await :: Promise a e -> Async (Promise a e) e a
 	 *
-	 *	This will wait for the value from the
-	 *	specified promise when the Async is ran.
+	 *	This basically just maps Promises into
+	 *	Asyncs.
 	 */
 	static await(promise) {
 		return Async.create((succ, fail) => promise.then(succ, fail));
 	}
+
+	/**
+	 *	fromPromise :: Promise a e -> Async (Promise a e) e a
+	 *
+	 *	Alias of await
+	 */
+	static fromPromise(promise) {
+		return Async.await(promise);
+	}
 }
 
-/* The Async interpreter doesn't do anything,
-it just exists so Async can be used with other
-Free monads. It literally maps Asyncs back onto Asyncs.
 
-Other Free monads will provide interpreters to map to
-Async as well
-*/
-Async.interpreter = (execute) => ({
-	/**
-	 *	prepare :: Interpreter -> () -> Async ()
-	 *
-	 *	Prepares interpretation context for Async.
-	 */
-	prepare() {
-		return Async.unit();
-	},
-
-	/**
-	 *	map :: Interpreter -> AsyncFunctor b a -> [Async b a, (a -> Free f a | Free f a)]
-	 *
-	 *	Maps an AsyncComputation into a new Async, essentially doing
-	 *	nothing.
-	 */
-	map(comp) {
-		return comp.case({
-			AsyncComputation: (t, n) => [Async.create(t), n],
-			AsyncHandler: (a, h, n) => [Async.catch(execute(a), h), n],
-			AsyncFirst: (cs, n) => [Async.first(cs.map(execute)), n],
-			default: () => null,
-		});
-	},
-
-	/**
-	 *	cleanup :: Interpreter -> a -> Async () ()
-	 *
-	 *	We don't need to clean up anything.
-	 */
-	cleanup(result) {
-		return Async.unit();
-	},
-
-	/**
-	 *	cleanupErr :: Interpreter -> b -> Async () ()
-	 *
-	 *	We don't need to clean up anything.
-	 */
-	cleanupErr(err) {
-		return Async.unit();
-	}
-});
 
 module.exports = Async;

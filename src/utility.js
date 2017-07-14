@@ -47,29 +47,6 @@ const doM = exports.doM = function(genFn) {
 }
 
 /**
- *	mapM :: Monad m => Type m -> (a -> m b) -> [a] -> m [b]
- *
- *	Maps a monadic function over a list of values, sequencing each
- *	application over the list, and collecting the results into a new
- *	list, which is lifted into the monadic type provided.
- *
- *	TODO: Replace usages of this with _mapM, then rename
- *	_mapM to mapM and delete this function.
- */
-const mapM = exports.mapM = function(monad, fn, lst) {
-	if (lst.length === 0) {
-		return monad.unit([]);
-	}
-	else {
-		return fn(lst[0]).bind(x =>
-			mapM(monad, fn, lst.slice(1)).map(xs =>
-				[x].concat(xs)
-			)
-		);
-	}
-}
-
-/**
  *	when :: Applicative f => (bool, f ()) -> f ()
  *
  *	Performs the specified action when the specified
@@ -146,38 +123,119 @@ const foldlM = exports.foldlM = (monad, f) => z0 => xs => {
 }
 
 /**
- *	filterM :: Consable t, Monad m => (Type m, (a -> m bool)) -> t a -> m (t a)
+ *	filterM :: Consable t, Applicative f => (Type f, (a -> f bool)) -> t a -> f (t a)
  *
  *	Filters a specified list by using a predicate with results
- *	in the specified monad. Returns the filtered list in the
- *	specified monad.
+ *	in the specified applicative. Returns the filtered list in the
+ *	specified applicative.
  */
 const filterM = exports.filterM = (monad, predM) => xs => {
 	const t = xs.constructor;
 
 	const z0 = t.empty;
 
-	return foldlM(monad, (acc, v) => {
-		return predM(v)
-			.map(b => b ? t.append(v, acc) : acc);
-	})(z0)(xs);
+	const cons = t.cons;
+
+	//choice consing
+	const f = t => b => ts => b ? cons(t, ts) : ts;
+	return xs.foldr(
+		//choice consing
+		(x, acc) => predM(x).map(f(x)).app(acc),
+		monad.of(z0)
+	);
 }
 
 /**
- *	_mapM :: Consable t, Monad m => (Type m, (a -> m b)) -> t a -> m (t b)
+ *	mapM :: Consable t, Applicative f => (Type f, (a -> f b)) -> t a -> f (t b)
  *
- *	mapM defined to work over any Consable structure.
+ *	mapM defined to work over any Consable structure and with Applicatives.
  *
- *	We can alternatively define it as traverse on a
- *	Traversable structure (Foldable + Functor).
+ *	TODO: Implement the more generic Traversables and traverse and
+ *	define this in terms of that
  */
-const _mapM = exports._mapM = (monad, f) => xs => {
+const mapM = exports.mapM = (monad, f) => xs => {
 	const t = xs.constructor;
 
 	const z0 = t.empty;
 
-	return foldlM(monad, (acc, v) => {
-		return f(v)
-			.map(v2 => t.append(v2, acc));
-	})(z0)(xs);
+	const cons = t.cons;
+
+	const consC = t => ts => cons(t, ts);
+
+	return xs.foldr(
+		(x, acc) => f(x).map(consC).app(acc),
+		monad.of(z0)
+	);
+}
+
+/**
+ *	collect :: int=n -> (a -> a -> ... -> [a]).length=n+1
+ *
+ *	Constructs a function that collects n arguments into
+ *	a list. This is used with Applicative application to
+ *	collect results in parallel.
+ */
+const collect = exports.collect = function(n) {
+	//creates a new "collect context" and calls add the
+	//first time
+	return function(x) {
+		//counter to know when there is nothing left to apply
+		let i = n;
+		//the list of arguments that are received
+		const xs = [];
+
+		function add(x) {
+			//this check lets us work with n = 0
+			//although we would never use that for
+			//applicatives (or really much at all
+			//in FP)
+			if (typeof x !== 'undefined') {
+				xs.push(x);
+				i--;
+			}
+
+			//keep "currying" arguments
+			if (i) {
+				return add;
+			}
+			//return all the arguments
+			else {
+				return xs;
+			}
+		}
+
+		return add(x);
+	}
+}
+
+/**
+ *	all :: Applicative f => [f a] -> f [a]
+ *
+ *	Collects the results of a list of applicative
+ *	actions into a list.
+ */
+const all = exports.all = function(xs) {
+	return xs.slice(1)
+		.reduce(
+			(acc, x) => acc.app(x),
+			xs[0].map(collect(xs.length))
+		);
+}
+
+/**
+ *	replicateM :: Applicative f => (Type f, int, f a) -> f [a]
+ *
+ *	Repeats the specified action cnt times and collects
+ *	the results into a list.
+ */
+const replicateM = exports.replicateM = function(type, cnt, a) {
+	if (cnt <= 0)
+		return type.of([]);
+
+	//doing this iteratively so we don't blow the stack
+	let acc = a.map(collect(cnt));
+	while (--cnt)
+		acc = acc.app(a);
+
+	return acc;
 }

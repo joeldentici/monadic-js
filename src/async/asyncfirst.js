@@ -1,5 +1,5 @@
 'use strict';
-const CaseClass = require('js-helpers').CaseClass;
+const AsyncComputation = require('./asynccomputation.js');
 
 /**
  *	Monadic.Async.AsyncFirst
@@ -8,20 +8,44 @@ const CaseClass = require('js-helpers').CaseClass;
  *
  *	Holds a set of AsyncComputations.
  */
-class AsyncFirst extends CaseClass {
-	constructor(comps, continuation) {
-		super('AsyncFirst');
+class AsyncFirst extends AsyncComputation {
+	/**
+	 *	new :: [Async c e a] -> Async c e a
+	 *
+	 *	Constructs an AsyncFirst
+	 */
+	constructor(comps) {
+		super(null);
+		this.__type__ = 'AsyncFirst';
 		this.comps = comps;
-		this.continuation = continuation;
 	}
 
-	map(fn) {
-		return new AsyncFirst(
-			this.comps, x => fn(this.continuation(x)));
+	/**
+	 *	fork :: AsyncFirst e a -> (a -> b, e -> c) -> b | c
+	 *
+	 *	This overrides the AsyncComputation fork to fork all
+	 *	the Async computations and keep the result of whatever
+	 *	finishes first.
+	 */
+	fork(s, f) {
+		let done = false;
+		const succ = x => {
+			if (!done)
+				s(x);
+			done = true;
+		}
+
+		const fail = x => {
+			if (!done)
+				f(x);
+			done = true;
+		}
+
+		return this.comps.map(comp => comp.fork(succ, fail));
 	}
 
 	doCase(fn) {
-		return fn(this.comps, this.continuation);
+		return fn(this.comps);
 	}
 }
 module.exports = AsyncFirst;

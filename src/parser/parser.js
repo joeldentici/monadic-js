@@ -888,5 +888,6 @@ Parser.showError = err => (tokens, context = 30) => {
 }
 
 const {mapM} = require('../utility.js');
+const {useExtensions} = require('../extendArray.js');
 
-Parser.seq = (...parsers) => mapM(Parser, x => x, parsers);
+Parser.seq = (...parsers) => useExtensions(() => mapM(Parser, x => x)(parsers));

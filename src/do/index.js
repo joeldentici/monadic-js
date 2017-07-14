@@ -39,6 +39,8 @@ const path = require('path');
  *		Level 2 - Level 1 + Compilation output
  */
 module.exports = function(ext = '.ejs', verbose = 0) {
+	require('../extendFunction.js').addExtensions();
+
 	verbose && console.log('Loading do notation and expression extensions...');
 
 	function processFile(filename) {
