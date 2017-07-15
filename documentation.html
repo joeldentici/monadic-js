@@ -142,6 +142,48 @@
 			
 		<div class="module-header">
 			<div class="module-name">
+			Module: <a href="#doc.module.MonadicJS.ArrayExtensions">MonadicJS.ArrayExtensions</a>
+			</div>
+			<ul class="module-functions">
+				
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.MonadicJS.FunctionExtensions">MonadicJS.FunctionExtensions</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.MonadicJS.FunctionExtensions.func.map">
+					<b>map</b>
+				</a> <b>::</b> (a &#8594; b) &#8594; (b &#8594; c) &#8594; a &#8594; c
+			</li>
+		
+			<li>
+				<a href="#doc.module.MonadicJS.FunctionExtensions.func.chain">
+					<b>chain</b>
+				</a> <b>::</b> (a &#8594; b) &#8594; (b &#8594; (a &#8594; c)) &#8594; a &#8594; c
+			</li>
+		
+			<li>
+				<a href="#doc.module.MonadicJS.FunctionExtensions.func.arrow">
+					<b>arrow</b>
+				</a> <b>::</b> Monad m &#8658; (a &#8594; m b) &#8594; (b &#8594; m c) &#8594; a &#8594; m c
+			</li>
+		
+			<li>
+				<a href="#doc.module.MonadicJS.FunctionExtensions.func.alt">
+					<b>alt</b>
+				</a> <b>::</b> Alternative f &#8658; (a &#8594; f b) &#8594; (a &#8594; f c) &#8594; a &#8594; f (b | c)
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
 			Module: <a href="#doc.module.Monadic">Monadic</a>
 			</div>
 			<ul class="module-functions">
@@ -159,12 +201,6 @@
 				<a href="#doc.module.Monadic.Utility.func.doM">
 					<b>doM</b>
 				</a> <b>::</b> Monad m &#8658; (() &#8594; Iterator) &#8594; m a
-			</li>
-		
-			<li>
-				<a href="#doc.module.Monadic.Utility.func.mapM">
-					<b>mapM</b>
-				</a> <b>::</b> Monad m &#8658; Type m &#8594; (a &#8594; m b) &#8594; [a] &#8594; m [b]
 			</li>
 		
 			<li>
@@ -212,13 +248,25 @@
 			<li>
 				<a href="#doc.module.Monadic.Utility.func.filterM">
 					<b>filterM</b>
-				</a> <b>::</b> Consable t, Monad m &#8658; (Type m, (a &#8594; m bool)) &#8594; t a &#8594; m (t a)
+				</a> <b>::</b> Consable t, Applicative f &#8658; (Type f, (a &#8594; f bool)) &#8594; t a &#8594; f (t a)
 			</li>
 		
 			<li>
-				<a href="#doc.module.Monadic.Utility.func._mapM">
-					<b>_mapM</b>
-				</a> <b>::</b> Consable t, Monad m &#8658; (Type m, (a &#8594; m b)) &#8594; t a &#8594; m (t b)
+				<a href="#doc.module.Monadic.Utility.func.mapM">
+					<b>mapM</b>
+				</a> <b>::</b> Consable t, Applicative f &#8658; (Type f, (a &#8594; f b)) &#8594; t a &#8594; f (t b)
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Utility.func.all">
+					<b>all</b>
+				</a> <b>::</b> Applicative f &#8658; (Type f, [f a]) &#8594; f [a]
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Utility.func.replicateM">
+					<b>replicateM</b>
+				</a> <b>::</b> Applicative f &#8658; (Type f, int, f a) &#8594; f [a]
 			</li>
 		
 			</ul>
@@ -230,6 +278,132 @@
 			</div>
 			<ul class="module-functions">
 				
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.new">
+					<b>new</b>
+				</a> <b>::</b> ((a &#8594; (), e &#8594; ()) &#8594; c) &#8594; Async c e a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.fork">
+					<b>fork</b>
+				</a> <b>::</b> Async c e a &#8594; (a &#8594; (), e &#8594; ()) &#8594; ()
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.run">
+					<b>run</b>
+				</a> <b>::</b> Async c e a &#8594; ()
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.toPromise">
+					<b>toPromise</b>
+				</a> <b>::</b> Async c e a &#8594; Promise a e
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.bind">
+					<b>bind</b>
+				</a> <b>::</b> Async c e a &#8594; (a &#8594; Async c e b) &#8594; Async c e b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.chain">
+					<b>chain</b>
+				</a> <b>::</b> Async c e a &#8594; (a &#8594; Async c e2 b) &#8594; Async c e2 b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.chainFail">
+					<b>chainFail</b>
+				</a> <b>::</b> Async c e a &#8594; (e &#8594; Async c e2 b) &#8594; Async c e2 b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.catch">
+					<b>catch</b>
+				</a> <b>::</b> Async c e a &#8594; (e &#8594; Async c e2 b) &#8594; Async c e2 b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.map">
+					<b>map</b>
+				</a> <b>::</b> Async c e a &#8594; (a &#8594; b) &#8594; Async c e b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.tap">
+					<b>tap</b>
+				</a> <b>::</b> Async c e a &#8594; (a &#8594; ()) &#8594; Async c e a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.mapCatch">
+					<b>mapCatch</b>
+				</a> <b>::</b> Async c e a &#8594; (e &#8594; e2) &#8594; Async c e2 a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.tapFail">
+					<b>tapFail</b>
+				</a> <b>::</b> Async c e a &#8594; (e &#8594; ()) &#8594; Async c e a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.app">
+					<b>app</b>
+				</a> <b>::</b> Async c e (a &#8594; b) &#8594; Async c e a &#8594; Async c e b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.ap">
+					<b>ap</b>
+				</a> <b>::</b> Async c e a &#8594; Async c e (a &#8594; b) &#8594; Async c e b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.seqL">
+					<b>seqL</b>
+				</a> <b>::</b> Async c e a &#8594; Async c e b &#8594; Async c e a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.seqR">
+					<b>seqR</b>
+				</a> <b>::</b> Async c e a &#8594; Async c e b &#8594; Async c e b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.alt">
+					<b>alt</b>
+				</a> <b>::</b> Async c e a &#8594; Async c e b &#8594; Async c e (a | b)
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.doCase">
+					<b>doCase</b>
+				</a> <b>::</b> Async c e a &#8594; (((a &#8594; (), e &#8594; ()) &#8594; c) &#8594; b) &#8594; b
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.later">
+					<b>later</b>
+				</a> <b>::</b> (a &#8594; b) &#8594; a &#8594; ()
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.mapIt">
+					<b>mapIt</b>
+				</a> <b>::</b> ((b &#8594; ()), (e &#8594; ()), (a &#8594; b)) &#8594; (a &#8594; ())
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncComputation.func.chainIt">
+					<b>chainIt</b>
+				</a> <b>::</b> ((b &#8594; ()), (e &#8594; ()), (a &#8594; Async () e a)) &#8594; (a &#8594; ())
+			</li>
+		
 			</ul>
 		</div>
 	
@@ -239,15 +413,18 @@
 			</div>
 			<ul class="module-functions">
 				
-			</ul>
-		</div>
-	
-		<div class="module-header">
-			<div class="module-name">
-			Module: <a href="#doc.module.Monadic.Async.AsyncHandler">Monadic.Async.AsyncHandler</a>
-			</div>
-			<ul class="module-functions">
-				
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncFirst.func.new">
+					<b>new</b>
+				</a> <b>::</b> [Async c e a] &#8594; Async c e a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncFirst.func.fork">
+					<b>fork</b>
+				</a> <b>::</b> AsyncFirst e a &#8594; (a &#8594; b, e &#8594; c) &#8594; b | c
+			</li>
+		
 			</ul>
 		</div>
 	
@@ -260,107 +437,158 @@
 			<li>
 				<a href="#doc.module.Monadic.Async.func.create">
 					<b>create</b>
-				</a> <b>::</b> ((a &#8594; ()) &#8594; (b &#8594; ()) &#8594; ()) &#8594; Async b a
-			</li>
-		
-			<li>
-				<a href="#doc.module.Monadic.Async.func.catch">
-					<b>catch</b>
-				</a> <b>::</b> Async b a &#8594; (b &#8594; Async c d) &#8594; Async c d
+				</a> <b>::</b> ((a &#8594; ()) &#8594; (e &#8594; ()) &#8594; c) &#8594; Async c e a
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.try">
 					<b>try</b>
-				</a> <b>::</b> Async b a &#8594; Async b a
+				</a> <b>::</b> Async c e a &#8594; Async c e a
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.wrap">
 					<b>wrap</b>
-				</a> <b>::</b> (...any &#8594; (b &#8594; c &#8594; ()) &#8594; ()) &#8594; ...any &#8594; Async b c
+				</a> <b>::</b> ((...any, e &#8594; a &#8594; ()) &#8594; c) &#8594; ...any &#8594; Async c e a
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.wrapPromise">
 					<b>wrapPromise</b>
-				</a> <b>::</b> (...any &#8594; Promise a e) &#8594; ...any &#8594; Async a e
+				</a> <b>::</b> (...any &#8594; Promise a e) &#8594; ...any &#8594; Async (Promise a e) e a
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.unit">
 					<b>unit</b>
-				</a> <b>::</b> a &#8594; Async () a
+				</a> <b>::</b> a &#8594; Async () () a
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.of">
 					<b>of</b>
-				</a> <b>::</b> a &#8594; Async () a
+				</a> <b>::</b> a &#8594; Async () () a
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.fail">
 					<b>fail</b>
-				</a> <b>::</b> a &#8594; Async a ()
+				</a> <b>::</b> e &#8594; Async () e ()
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.run">
 					<b>run</b>
-				</a> <b>::</b> Async b a &#8594; Promise a b
+				</a> <b>::</b> Async c e a &#8594; ()
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.fork">
+					<b>fork</b>
+				</a> <b>::</b> (Async c b a, (a &#8594; d), (b &#8594; e)) &#8594; c
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.toPromise">
+					<b>toPromise</b>
+				</a> <b>::</b> Async c e a &#8594; Promise a e
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.sleep">
 					<b>sleep</b>
-				</a> <b>::</b> int &#8594; Async ()
+				</a> <b>::</b> int &#8594; Async int () ()
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.all">
 					<b>all</b>
-				</a> <b>::</b> ...Async e a &#8594; Async e [a]
+				</a> <b>::</b> ...Async c e a &#8594; Async c e [a]
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.first">
 					<b>first</b>
-				</a> <b>::</b> ...Async e a &#8594; Async e a
+				</a> <b>::</b> ...Async c e a &#8594; Async c e a
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.throwE">
 					<b>throwE</b>
-				</a> <b>::</b> e &#8594; Async e ()
+				</a> <b>::</b> e &#8594; Async () e ()
 			</li>
 		
 			<li>
 				<a href="#doc.module.Monadic.Async.func.await">
 					<b>await</b>
-				</a> <b>::</b> Promise a e &#8594; Async e a
+				</a> <b>::</b> Promise a e &#8594; Async (Promise a e) e a
 			</li>
 		
 			<li>
-				<a href="#doc.module.Monadic.Async.func.prepare">
+				<a href="#doc.module.Monadic.Async.func.fromPromise">
+					<b>fromPromise</b>
+				</a> <b>::</b> Promise a e &#8594; Async (Promise a e) e a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.fromEither">
+					<b>fromEither</b>
+				</a> <b>::</b> Either e a &#8594; Async () e a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.fromMaybe">
+					<b>fromMaybe</b>
+				</a> <b>::</b> Maybe a &#8594; Async () NonExistenceError a
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.func.parallel">
+					<b>parallel</b>
+				</a> <b>::</b> WebWorker &#8594; ((a_0..a_n) &#8594; b) &#8594; (a_0..a_n) &#8594; Async () Error b
+			</li>
+		
+			</ul>
+		</div>
+	
+		<div class="module-header">
+			<div class="module-name">
+			Module: <a href="#doc.module.Monadic.Async.AsyncHandler">Monadic.Async.AsyncHandler</a>
+			</div>
+			<ul class="module-functions">
+				
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncHandler.func.">
+					<b></b>
+				</a> <b>::</b> onadic.Async.AsyncFirst
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncHandler.func.">
+					<b></b>
+				</a> <b>::</b> onadic.Async.AsyncComputation
+			</li>
+		
+			<li>
+				<a href="#doc.module.Monadic.Async.AsyncHandler.func.prepare">
 					<b>prepare</b>
 				</a> <b>::</b> Interpreter &#8594; () &#8594; Async ()
 			</li>
 		
 			<li>
-				<a href="#doc.module.Monadic.Async.func.map">
+				<a href="#doc.module.Monadic.Async.AsyncHandler.func.map">
 					<b>map</b>
 				</a> <b>::</b> Interpreter &#8594; AsyncFunctor b a &#8594; [Async b a, (a &#8594; Free f a | Free f a)]
 			</li>
 		
 			<li>
-				<a href="#doc.module.Monadic.Async.func.cleanup">
+				<a href="#doc.module.Monadic.Async.AsyncHandler.func.cleanup">
 					<b>cleanup</b>
 				</a> <b>::</b> Interpreter &#8594; a &#8594; Async () ()
 			</li>
 		
 			<li>
-				<a href="#doc.module.Monadic.Async.func.cleanupErr">
+				<a href="#doc.module.Monadic.Async.AsyncHandler.func.cleanupErr">
 					<b>cleanupErr</b>
 				</a> <b>::</b> Interpreter &#8594; b &#8594; Async () ()
 			</li>
@@ -665,12 +893,6 @@
 				</a> <b>::</b> Free f (a &#8594; b) &#8594; Free f a &#8594; Free f b
 			</li>
 		
-			<li>
-				<a href="#doc.module.Monadic.Free.Free.func.alt">
-					<b>alt</b>
-				</a> <b>::</b> Free f a &#8594; Free f b &#8594; Free f (a | b)
-			</li>
-		
 			</ul>
 		</div>
 	
@@ -741,12 +963,6 @@
 				<a href="#doc.module.Monadic.Free.Return.func.ap">
 					<b>ap</b>
 				</a> <b>::</b> Free f (a &#8594; b) &#8594; Free f a &#8594; Free f b
-			</li>
-		
-			<li>
-				<a href="#doc.module.Monadic.Free.Return.func.alt">
-					<b>alt</b>
-				</a> <b>::</b> Free f a &#8594; Free f b &#8594; Free f (a | b)
 			</li>
 		
 			</ul>
@@ -1224,6 +1440,103 @@
 			<div class="project-description">
 			<h2>Module Description</h2>
 			
+		<div class="module-description" id="doc.module.MonadicJS.ArrayExtensions">
+			<div class="module-name">
+				Module: MonadicJS.ArrayExtensions
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> 
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 
+			</div>
+			<div class="module-desc">
+			WARNING: This modifies the Array prototype
+so you should always unload it when done. You
+may still mess other code up if you use these
+extensions in an asynchronous section of code.
+			</div>
+			<div class="module-functions">
+				
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.MonadicJS.FunctionExtensions">
+			<div class="module-name">
+				Module: MonadicJS.FunctionExtensions
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> 
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 
+			</div>
+			<div class="module-desc">
+			WARNING: This modifies the Function prototype
+so you should always unload it when done. You
+may still mess other code up if you use these
+extensions in an asynchronous section of code.<br><br>NOTE: Using the do-notation/expr language extension
+will automatically load these extensions. That is because
+they include kleisi composition, which it provides an operator
+for.
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.MonadicJS.FunctionExtensions.func.map">
+				<div class="function-name">
+					<b>map</b> <b>::</b> (a &#8594; b) &#8594; (b &#8594; c) &#8594; a &#8594; c
+				</div>
+				<div class="function-desc">
+					
+Sequencing of functions.<br><br>The Haskell definition is composition of functions
+but we define map with its arguments backwards for
+all our Functors so it can live on the object, which
+means out map = flip haskellmap = sequence
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.MonadicJS.FunctionExtensions.func.chain">
+				<div class="function-name">
+					<b>chain</b> <b>::</b> (a &#8594; b) &#8594; (b &#8594; (a &#8594; c)) &#8594; a &#8594; c
+				</div>
+				<div class="function-desc">
+					
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.MonadicJS.FunctionExtensions.func.arrow">
+				<div class="function-name">
+					<b>arrow</b> <b>::</b> Monad m &#8658; (a &#8594; m b) &#8594; (b &#8594; m c) &#8594; a &#8594; m c
+				</div>
+				<div class="function-desc">
+					
+Left-to-right Kleisi composition of monadic functions.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.MonadicJS.FunctionExtensions.func.alt">
+				<div class="function-name">
+					<b>alt</b> <b>::</b> Alternative f &#8658; (a &#8594; f b) &#8594; (a &#8594; f c) &#8594; a &#8594; f (b | c)
+				</div>
+				<div class="function-desc">
+					
+This lifts the alternative combinator for an Alternative to
+work on alternative returning functions. Note that this will
+always evaluate both functions to use the alternative instance
+of their return values. As long as your alternative is side-effect
+free, this won't cause any problems. If it is not and those side-effects
+are critical (ie, not console.logs or something similar), you might
+wind up with corrupt data somewhere.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
 		<div class="module-description" id="doc.module.Monadic">
 			<div class="module-name">
 				Module: Monadic
@@ -1284,20 +1597,6 @@ to be a value semantically, which means it should
 be able to be reused. The generator approach also
 cannot accommodate monads like the list monad that
 apply their bound function more than once.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Utility.func.mapM">
-				<div class="function-name">
-					<b>mapM</b> <b>::</b> Monad m &#8658; Type m &#8594; (a &#8594; m b) &#8594; [a] &#8594; m [b]
-				</div>
-				<div class="function-desc">
-					
-Maps a monadic function over a list of values, sequencing each
-application over the list, and collecting the results into a new
-list, which is lifted into the monadic type provided.<br><br>TODO: Replace usages of this with _mapM, then rename
-_mapM to mapM and delete this function.
 				</div>
 			</div>
 		
@@ -1387,25 +1686,51 @@ Monadic fold over a structure, from left to right.
 			<div class="function-description"
 			id="doc.module.Monadic.Utility.func.filterM">
 				<div class="function-name">
-					<b>filterM</b> <b>::</b> Consable t, Monad m &#8658; (Type m, (a &#8594; m bool)) &#8594; t a &#8594; m (t a)
+					<b>filterM</b> <b>::</b> Consable t, Applicative f &#8658; (Type f, (a &#8594; f bool)) &#8594; t a &#8594; f (t a)
 				</div>
 				<div class="function-desc">
 					
 Filters a specified list by using a predicate with results
-in the specified monad. Returns the filtered list in the
-specified monad.
+in the specified applicative. Returns the filtered list in the
+specified applicative.
 				</div>
 			</div>
 		
 			<div class="function-description"
-			id="doc.module.Monadic.Utility.func._mapM">
+			id="doc.module.Monadic.Utility.func.mapM">
 				<div class="function-name">
-					<b>_mapM</b> <b>::</b> Consable t, Monad m &#8658; (Type m, (a &#8594; m b)) &#8594; t a &#8594; m (t b)
+					<b>mapM</b> <b>::</b> Consable t, Applicative f &#8658; (Type f, (a &#8594; f b)) &#8594; t a &#8594; f (t b)
 				</div>
 				<div class="function-desc">
 					
-mapM defined to work over any Consable structure.<br><br>We can alternatively define it as traverse on a
-Traversable structure (Foldable + Functor).
+mapM defined to work over any Consable structure and with Applicatives.<br><br>TODO: Implement the more generic Traversables and traverse and
+define this in terms of that
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Utility.func.all">
+				<div class="function-name">
+					<b>all</b> <b>::</b> Applicative f &#8658; (Type f, [f a]) &#8594; f [a]
+				</div>
+				<div class="function-desc">
+					
+Collects the results of a list of applicative
+actions into a list. This is more efficient than
+mapM (Type f, id), because it uses array push on
+the result list rather than creating intermediate arrays.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Utility.func.replicateM">
+				<div class="function-name">
+					<b>replicateM</b> <b>::</b> Applicative f &#8658; (Type f, int, f a) &#8594; f [a]
+				</div>
+				<div class="function-desc">
+					
+Repeats the specified action cnt times and collects
+the results into a list.
 				</div>
 			</div>
 		
@@ -1427,6 +1752,265 @@ Traversable structure (Foldable + Functor).
 			</div>
 			<div class="module-functions">
 				
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.new">
+				<div class="function-name">
+					<b>new</b> <b>::</b> ((a &#8594; (), e &#8594; ()) &#8594; c) &#8594; Async c e a
+				</div>
+				<div class="function-desc">
+					
+Creates an Async computation from the provided thunked
+computation, which will be called with callbacks for a result
+or error when the Async computation is forked/ran.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.fork">
+				<div class="function-name">
+					<b>fork</b> <b>::</b> Async c e a &#8594; (a &#8594; (), e &#8594; ()) &#8594; ()
+				</div>
+				<div class="function-desc">
+					
+Runs the Async computation. The success or fail
+function is applied to its result, depending on
+whether it is successful or not.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.run">
+				<div class="function-name">
+					<b>run</b> <b>::</b> Async c e a &#8594; ()
+				</div>
+				<div class="function-desc">
+					
+Forks the computation and throws away the results.<br><br>Useful for when you were using the Async results to
+do side effects that could throw errors in a tap
+and wanted to catch them using chainFail/catch.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.toPromise">
+				<div class="function-name">
+					<b>toPromise</b> <b>::</b> Async c e a &#8594; Promise a e
+				</div>
+				<div class="function-desc">
+					
+This is the same as forking the computation, but
+you get back a Promise for the result.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.bind">
+				<div class="function-name">
+					<b>bind</b> <b>::</b> Async c e a &#8594; (a &#8594; Async c e b) &#8594; Async c e b
+				</div>
+				<div class="function-desc">
+					
+Alias for chain.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.chain">
+				<div class="function-name">
+					<b>chain</b> <b>::</b> Async c e a &#8594; (a &#8594; Async c e2 b) &#8594; Async c e2 b
+				</div>
+				<div class="function-desc">
+					
+Monadic binding of Async computations. The computations
+run sequentially. Failed computations do not get piped
+through.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.chainFail">
+				<div class="function-name">
+					<b>chainFail</b> <b>::</b> Async c e a &#8594; (e &#8594; Async c e2 b) &#8594; Async c e2 b
+				</div>
+				<div class="function-desc">
+					
+Same as chain/bind but the function is applied when this
+computation fails.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.catch">
+				<div class="function-name">
+					<b>catch</b> <b>::</b> Async c e a &#8594; (e &#8594; Async c e2 b) &#8594; Async c e2 b
+				</div>
+				<div class="function-desc">
+					
+Alias for chainFail.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.map">
+				<div class="function-name">
+					<b>map</b> <b>::</b> Async c e a &#8594; (a &#8594; b) &#8594; Async c e b
+				</div>
+				<div class="function-desc">
+					
+Applies the function to the result of this computation.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.tap">
+				<div class="function-name">
+					<b>tap</b> <b>::</b> Async c e a &#8594; (a &#8594; ()) &#8594; Async c e a
+				</div>
+				<div class="function-desc">
+					
+Tap into the Async computation at a certain point
+to perform a side effect. This should be used with
+care and mainly only by the consumer of an Async computation.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.mapCatch">
+				<div class="function-name">
+					<b>mapCatch</b> <b>::</b> Async c e a &#8594; (e &#8594; e2) &#8594; Async c e2 a
+				</div>
+				<div class="function-desc">
+					
+Applies the function to the error of this computation.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.tapFail">
+				<div class="function-name">
+					<b>tapFail</b> <b>::</b> Async c e a &#8594; (e &#8594; ()) &#8594; Async c e a
+				</div>
+				<div class="function-desc">
+					
+Tap for failures.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.app">
+				<div class="function-name">
+					<b>app</b> <b>::</b> Async c e (a &#8594; b) &#8594; Async c e a &#8594; Async c e b
+				</div>
+				<div class="function-desc">
+					
+Applicative application. Applies the function result of
+this Async computation to the result of the specified Async
+computation. If used with an n-ary curried function, then
+app can be chained n times to fully apply it.<br><br>This is written such that chained applications will run
+the computations concurrently.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.ap">
+				<div class="function-name">
+					<b>ap</b> <b>::</b> Async c e a &#8594; Async c e (a &#8594; b) &#8594; Async c e b
+				</div>
+				<div class="function-desc">
+					
+Flipped arguments for app. This is for fantasy-land, but
+probably isn't very useful as it breaks chaining.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.seqL">
+				<div class="function-name">
+					<b>seqL</b> <b>::</b> Async c e a &#8594; Async c e b &#8594; Async c e a
+				</div>
+				<div class="function-desc">
+					
+Sequences Async computations, keeping the value of
+the one on the left. The computations are ran concurrently.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.seqR">
+				<div class="function-name">
+					<b>seqR</b> <b>::</b> Async c e a &#8594; Async c e b &#8594; Async c e b
+				</div>
+				<div class="function-desc">
+					
+Sequence Async computations, keeping the value of
+the one on the right. The computations are ran concurrently.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.alt">
+				<div class="function-name">
+					<b>alt</b> <b>::</b> Async c e a &#8594; Async c e b &#8594; Async c e (a | b)
+				</div>
+				<div class="function-desc">
+					
+Alternative sequencing. The computation on the left is
+ran and if it is successful, its result is used. If it
+fails, then the computation on the right is ran and its
+result is used.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.doCase">
+				<div class="function-name">
+					<b>doCase</b> <b>::</b> Async c e a &#8594; (((a &#8594; (), e &#8594; ()) &#8594; c) &#8594; b) &#8594; b
+				</div>
+				<div class="function-desc">
+					
+Applies the function to the thunked computation.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.later">
+				<div class="function-name">
+					<b>later</b> <b>::</b> (a &#8594; b) &#8594; a &#8594; ()
+				</div>
+				<div class="function-desc">
+					
+Wraps the application to the specified function
+in an application of the immediate function.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.mapIt">
+				<div class="function-name">
+					<b>mapIt</b> <b>::</b> ((b &#8594; ()), (e &#8594; ()), (a &#8594; b)) &#8594; (a &#8594; ())
+				</div>
+				<div class="function-desc">
+					
+Returns a new function that applies fn to whatever value
+it gets and then applies cont to that. If an error occurs
+in fn, then we will catch it and fail with it.<br><br>Note: This allows breaking out of the monadic control flow
+by throwing in a map, but it is very important that we don't
+bring down an entire application by one Async computation having
+an error in it.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncComputation.func.chainIt">
+				<div class="function-name">
+					<b>chainIt</b> <b>::</b> ((b &#8594; ()), (e &#8594; ()), (a &#8594; Async () e a)) &#8594; (a &#8594; ())
+				</div>
+				<div class="function-desc">
+					
+Performs the monadic chaining while catching any errors that occur.
+				</div>
+			</div>
+		
 			</div>
 		</div>
 	
@@ -1445,6 +2029,305 @@ Traversable structure (Foldable + Functor).
 			</div>
 			<div class="module-functions">
 				
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncFirst.func.new">
+				<div class="function-name">
+					<b>new</b> <b>::</b> [Async c e a] &#8594; Async c e a
+				</div>
+				<div class="function-desc">
+					
+Constructs an AsyncFirst
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.AsyncFirst.func.fork">
+				<div class="function-name">
+					<b>fork</b> <b>::</b> AsyncFirst e a &#8594; (a &#8594; b, e &#8594; c) &#8594; b | c
+				</div>
+				<div class="function-desc">
+					
+This overrides the AsyncComputation fork to fork all
+the Async computations and keep the result of whatever
+finishes first.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="module-description" id="doc.module.Monadic.Async">
+			<div class="module-name">
+				Module: Monadic.Async
+			</div>
+			<div class="module-author">
+			<b>Written By:</b> Joel Dentici
+			</div>
+			<div class="module-date">
+			<b>Written On:</b> 6/25/2017
+			</div>
+			<div class="module-desc">
+			The Async monad represents computations
+that run in an asynchronous context.<br><br>Unlike Promises, an Async computation is
+lazily evaluated, so it won't be executed
+immediately. Asyncs can be turned into Promises
+by calling "run" on them and Promises can be turned
+into Asyncs by applying Async.fromPromise to them
+			</div>
+			<div class="module-functions">
+				
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.create">
+				<div class="function-name">
+					<b>create</b> <b>::</b> ((a &#8594; ()) &#8594; (e &#8594; ()) &#8594; c) &#8594; Async c e a
+				</div>
+				<div class="function-desc">
+					
+Creates an Async computation. Takes a function that
+accepts two functions, one for a successful computation
+an one for a failed computation. This function is not
+executed until the Async is ran.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.try">
+				<div class="function-name">
+					<b>try</b> <b>::</b> Async c e a &#8594; Async c e a
+				</div>
+				<div class="function-desc">
+					
+This method literally doesn't do anything. It is just
+here to make catching look more imperative by surrounding
+it with try.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.wrap">
+				<div class="function-name">
+					<b>wrap</b> <b>::</b> ((...any, e &#8594; a &#8594; ()) &#8594; c) &#8594; ...any &#8594; Async c e a
+				</div>
+				<div class="function-desc">
+					
+Wraps a callback taking async function so it becomes a function
+that returns Async computations.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.wrapPromise">
+				<div class="function-name">
+					<b>wrapPromise</b> <b>::</b> (...any &#8594; Promise a e) &#8594; ...any &#8594; Async (Promise a e) e a
+				</div>
+				<div class="function-desc">
+					
+Wraps a promise returning async function so it becomes a function
+that returns Async computations.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.unit">
+				<div class="function-name">
+					<b>unit</b> <b>::</b> a &#8594; Async () () a
+				</div>
+				<div class="function-desc">
+					
+Puts a value into the context of
+an Async computation.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.of">
+				<div class="function-name">
+					<b>of</b> <b>::</b> a &#8594; Async () () a
+				</div>
+				<div class="function-desc">
+					
+Alias for unit. Provided for fantasy-land
+compliance.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.fail">
+				<div class="function-name">
+					<b>fail</b> <b>::</b> e &#8594; Async () e ()
+				</div>
+				<div class="function-desc">
+					
+Returns an Async computation that failed
+for the specified reason.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.run">
+				<div class="function-name">
+					<b>run</b> <b>::</b> Async c e a &#8594; ()
+				</div>
+				<div class="function-desc">
+					
+Runs the asynchronous computation, discarding
+the result.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.fork">
+				<div class="function-name">
+					<b>fork</b> <b>::</b> (Async c b a, (a &#8594; d), (b &#8594; e)) &#8594; c
+				</div>
+				<div class="function-desc">
+					
+Runs the asynchronous computation. Its result
+will be passed to succ or fail as appropriate.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.toPromise">
+				<div class="function-name">
+					<b>toPromise</b> <b>::</b> Async c e a &#8594; Promise a e
+				</div>
+				<div class="function-desc">
+					
+Forks the computation and returns a promise
+for its result.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.sleep">
+				<div class="function-name">
+					<b>sleep</b> <b>::</b> int &#8594; Async int () ()
+				</div>
+				<div class="function-desc">
+					
+Creates an Async computation that sleeps for the specified
+timespan in milliseconds and returns no result.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.all">
+				<div class="function-name">
+					<b>all</b> <b>::</b> ...Async c e a &#8594; Async c e [a]
+				</div>
+				<div class="function-desc">
+					
+Returns an Async computation whose result
+combines all the results from the provided
+Asyncs.<br><br>If any of the Asyncs fail, then the resulting
+Async will have its error.<br><br>This can be called with an array or rest args.<br><br>There must be at least one computation provided,
+regardless of how this is called.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.first">
+				<div class="function-name">
+					<b>first</b> <b>::</b> ...Async c e a &#8594; Async c e a
+				</div>
+				<div class="function-desc">
+					
+Returns an Async computation whose result is
+the result of the first provided computation to
+finish.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.throwE">
+				<div class="function-name">
+					<b>throwE</b> <b>::</b> e &#8594; Async () e ()
+				</div>
+				<div class="function-desc">
+					
+Alias of fail
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.await">
+				<div class="function-name">
+					<b>await</b> <b>::</b> Promise a e &#8594; Async (Promise a e) e a
+				</div>
+				<div class="function-desc">
+					
+This basically just maps Promises into
+Asyncs.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.fromPromise">
+				<div class="function-name">
+					<b>fromPromise</b> <b>::</b> Promise a e &#8594; Async (Promise a e) e a
+				</div>
+				<div class="function-desc">
+					
+Alias of await
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.fromEither">
+				<div class="function-name">
+					<b>fromEither</b> <b>::</b> Either e a &#8594; Async () e a
+				</div>
+				<div class="function-desc">
+					
+Creates an Async computation whose result or failure
+is the value in the specified Either.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.fromMaybe">
+				<div class="function-name">
+					<b>fromMaybe</b> <b>::</b> Maybe a &#8594; Async () NonExistenceError a
+				</div>
+				<div class="function-desc">
+					
+Creates an Async computation whose result is the
+value in the Maybe. If the Maybe is Nothing, then
+the Async computation will result in a NonExistenceError.
+				</div>
+			</div>
+		
+			<div class="function-description"
+			id="doc.module.Monadic.Async.func.parallel">
+				<div class="function-name">
+					<b>parallel</b> <b>::</b> WebWorker &#8594; ((a_0..a_n) &#8594; b) &#8594; (a_0..a_n) &#8594; Async () Error b
+				</div>
+				<div class="function-desc">
+					
+Allows running functions in a fully parallel context.<br><br>Functions cannot be curried! If you try to use a curried
+function with this, the result will be a CurryingError.
+If you pass in a function that has already been curried,
+you will get a ReferenceError on its curried arguments.
+This is because the function is serialized to source and
+passed to the worker for execution. Serializing a curried
+function does not carry its environment, so it will have
+free variables in its body.<br><br>Applying parallel to a WebWorker implementation returns
+a function that can be used to wrap functions to run
+on another thread/process and return their results in
+an Async.<br><br>Note that you can achieve concurrency with CPU-bound
+computations by just using Async computations -- All
+you need to do is break them up into chains where you
+return results with Async.of or even just by chaining
+map from an initial Async.of() and turn iteration into
+recursion (you can also write most loops as higher order
+functions but that is inelegant). This works, but it isn't
+truly parallel as it doesn't utilize multiple CPU cores. It
+is essentially just time-sharing of coroutines (which can be
+faster than threads or processes for simple tasks).<br><br>Using this will give you truly parallel computation.
+				</div>
+			</div>
+		
 			</div>
 		</div>
 	
@@ -1464,209 +2347,30 @@ for a failed computation.
 			</div>
 			<div class="module-functions">
 				
-			</div>
-		</div>
-	
-		<div class="module-description" id="doc.module.Monadic.Async">
-			<div class="module-name">
-				Module: Monadic.Async
-			</div>
-			<div class="module-author">
-			<b>Written By:</b> Joel Dentici
-			</div>
-			<div class="module-date">
-			<b>Written On:</b> 6/25/2017
-			</div>
-			<div class="module-desc">
-			The Async monad represents computations
-that run in an asynchronous context.<br><br>Unlike Promises, an Async computation is
-lazily evaluated, so it won't be executed
-immediately.<br><br>Async provides an Interpreter to be used
-with the Free.createInterpreter function so it
-can be used with other Free monads. It maps to
-Async, as it is expected that most interpreters
-will do the same. Because of this, it essentially
-doesn't do anything.<br><br>A method called run is also provided to 
-interpret an Async into a Promise.
-			</div>
-			<div class="module-functions">
-				
 			<div class="function-description"
-			id="doc.module.Monadic.Async.func.create">
+			id="doc.module.Monadic.Async.AsyncHandler.func.">
 				<div class="function-name">
-					<b>create</b> <b>::</b> ((a &#8594; ()) &#8594; (b &#8594; ()) &#8594; ()) &#8594; Async b a
+					<b></b> <b>::</b> onadic.Async.AsyncFirst
 				</div>
 				<div class="function-desc">
-					
-Creates an Async computation. Takes a function that
-accepts two functions, one for a successful computation
-an one for a failed computation. This function is not
-executed until the Async is ran.
+					written by Joel Dentici
+on 6/25/2017<br><br>Holds a set of AsyncComputations.
 				</div>
 			</div>
 		
 			<div class="function-description"
-			id="doc.module.Monadic.Async.func.catch">
+			id="doc.module.Monadic.Async.AsyncHandler.func.">
 				<div class="function-name">
-					<b>catch</b> <b>::</b> Async b a &#8594; (b &#8594; Async c d) &#8594; Async c d
+					<b></b> <b>::</b> onadic.Async.AsyncComputation
 				</div>
 				<div class="function-desc">
-					
-Creates an Async handler. This takes an Async computation
-and an error handler function.
+					written by Joel Dentici
+on 6/25/2017<br><br>Holds a thunked computation.
 				</div>
 			</div>
 		
 			<div class="function-description"
-			id="doc.module.Monadic.Async.func.try">
-				<div class="function-name">
-					<b>try</b> <b>::</b> Async b a &#8594; Async b a
-				</div>
-				<div class="function-desc">
-					
-Adds a "catch" method to the provided Async computation.
-This is a convenience method to allow Async.catch to be
-infix, and make monadic code look more imperative.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.wrap">
-				<div class="function-name">
-					<b>wrap</b> <b>::</b> (...any &#8594; (b &#8594; c &#8594; ()) &#8594; ()) &#8594; ...any &#8594; Async b c
-				</div>
-				<div class="function-desc">
-					
-Wraps a callback taking async function so it becomes a function
-that returns Async computations.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.wrapPromise">
-				<div class="function-name">
-					<b>wrapPromise</b> <b>::</b> (...any &#8594; Promise a e) &#8594; ...any &#8594; Async a e
-				</div>
-				<div class="function-desc">
-					
-Wraps a promise returning async function so it becomes a function
-that returns Async computations.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.unit">
-				<div class="function-name">
-					<b>unit</b> <b>::</b> a &#8594; Async () a
-				</div>
-				<div class="function-desc">
-					
-Puts a value into the context of
-an Async computation.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.of">
-				<div class="function-name">
-					<b>of</b> <b>::</b> a &#8594; Async () a
-				</div>
-				<div class="function-desc">
-					
-Alias for unit. Provided for fantasy-land
-compliance.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.fail">
-				<div class="function-name">
-					<b>fail</b> <b>::</b> a &#8594; Async a ()
-				</div>
-				<div class="function-desc">
-					
-Returns an Async computation that failed
-for the specified reason.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.run">
-				<div class="function-name">
-					<b>run</b> <b>::</b> Async b a &#8594; Promise a b
-				</div>
-				<div class="function-desc">
-					
-Runs the asynchronous computation and
-returns a promise for the result.<br><br>run only runs the Async on the first application.
-Any subsequent applications will return the promise
-from the first application.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.sleep">
-				<div class="function-name">
-					<b>sleep</b> <b>::</b> int &#8594; Async ()
-				</div>
-				<div class="function-desc">
-					
-Creates an Async computation that sleeps for the specified
-timespan in milliseconds and returns no result.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.all">
-				<div class="function-name">
-					<b>all</b> <b>::</b> ...Async e a &#8594; Async e [a]
-				</div>
-				<div class="function-desc">
-					
-Returns an Async computation whose result
-combines all the results from the provided
-Asyncs.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.first">
-				<div class="function-name">
-					<b>first</b> <b>::</b> ...Async e a &#8594; Async e a
-				</div>
-				<div class="function-desc">
-					
-Returns an Async computation whose result is
-the result of the first provided computation to
-finish.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.throwE">
-				<div class="function-name">
-					<b>throwE</b> <b>::</b> e &#8594; Async e ()
-				</div>
-				<div class="function-desc">
-					
-Alias of fail
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.await">
-				<div class="function-name">
-					<b>await</b> <b>::</b> Promise a e &#8594; Async e a
-				</div>
-				<div class="function-desc">
-					
-This will wait for the value from the
-specified promise when the Async is ran.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Async.func.prepare">
+			id="doc.module.Monadic.Async.AsyncHandler.func.prepare">
 				<div class="function-name">
 					<b>prepare</b> <b>::</b> Interpreter &#8594; () &#8594; Async ()
 				</div>
@@ -1677,7 +2381,7 @@ Prepares interpretation context for Async.
 			</div>
 		
 			<div class="function-description"
-			id="doc.module.Monadic.Async.func.map">
+			id="doc.module.Monadic.Async.AsyncHandler.func.map">
 				<div class="function-name">
 					<b>map</b> <b>::</b> Interpreter &#8594; AsyncFunctor b a &#8594; [Async b a, (a &#8594; Free f a | Free f a)]
 				</div>
@@ -1689,7 +2393,7 @@ nothing.
 			</div>
 		
 			<div class="function-description"
-			id="doc.module.Monadic.Async.func.cleanup">
+			id="doc.module.Monadic.Async.AsyncHandler.func.cleanup">
 				<div class="function-name">
 					<b>cleanup</b> <b>::</b> Interpreter &#8594; a &#8594; Async () ()
 				</div>
@@ -1700,7 +2404,7 @@ We don't need to clean up anything.
 			</div>
 		
 			<div class="function-description"
-			id="doc.module.Monadic.Async.func.cleanupErr">
+			id="doc.module.Monadic.Async.AsyncHandler.func.cleanupErr">
 				<div class="function-name">
 					<b>cleanupErr</b> <b>::</b> Interpreter &#8594; b &#8594; Async () ()
 				</div>
@@ -2351,19 +3055,6 @@ inside the provided Free.
 				</div>
 			</div>
 		
-			<div class="function-description"
-			id="doc.module.Monadic.Free.Free.func.alt">
-				<div class="function-name">
-					<b>alt</b> <b>::</b> Free f a &#8594; Free f b &#8594; Free f (a | b)
-				</div>
-				<div class="function-desc">
-					
-This is a really bad way to get an alternative instance,
-but we essentially just force using Async's try and catch.<br><br>Hacky, sure, but it is useful for DSLs that are going to be
-interpreted to Async anyway.
-				</div>
-			</div>
-		
 			</div>
 		</div>
 	
@@ -2506,19 +3197,6 @@ in this context.
 					
 Applies the function in this Return to the
 value in the provided Free.
-				</div>
-			</div>
-		
-			<div class="function-description"
-			id="doc.module.Monadic.Free.Return.func.alt">
-				<div class="function-name">
-					<b>alt</b> <b>::</b> Free f a &#8594; Free f b &#8594; Free f (a | b)
-				</div>
-				<div class="function-desc">
-					
-This is a really bad way to get an alternative instance,
-but we essentially just force using Async's try and catch.<br><br>Hacky, sure, but it is useful for DSLs that are going to be
-interpreted to Async anyway.
 				</div>
 			</div>
 		
@@ -2732,7 +3410,7 @@ a procedure specific to this.<br><br>It implements the following Fantasyland alg
 	Chain
 	Monad<br><br>We also alias our names for the operations of the
 above algebras, as well as providing aliases for
-names specific to parsing.
+names specific to parsing.<br><br>The names for some operations were taken from Parsimmon.
 			</div>
 			<div class="module-functions">
 				
@@ -3547,7 +4225,7 @@ the new state.
 			</div>
 
 			<div class="footer">
-			This documentation was generated by <code>hmdoc</code> on <code>7/12/2017, 10:01:37 PM</code>
+			This documentation was generated by <code>hmdoc</code> on <code>7/14/2017, 9:46:37 PM</code>
 			</div>
 		</body>
 	</html>
