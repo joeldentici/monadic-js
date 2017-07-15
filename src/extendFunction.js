@@ -48,8 +48,13 @@ const newPrototype = {
 	/**
 	 *	alt :: Alternative f => (a -> f b) -> (a -> f c) -> a -> f (b | c)
 	 *
-	 *	This isn't really a true Alternative instance (there is no empty),
-	 *	but it is useful to provide alternative composition at the function level.
+	 *	This lifts the alternative combinator for an Alternative to
+	 *	work on alternative returning functions. Note that this will
+	 *	always evaluate both functions to use the alternative instance
+	 *	of their return values. As long as your alternative is side-effect
+	 *	free, this won't cause any problems. If it is not and those side-effects
+	 *	are critical (ie, not console.logs or something similar), you might
+	 *	wind up with corrupt data somewhere.
 	 */
 	alt: function(f) {
 		return x => this(x).alt(f(x));
