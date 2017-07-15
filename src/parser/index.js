@@ -33,6 +33,8 @@ const Parser = require('./parser.js');
  *	We also alias our names for the operations of the
  *	above algebras, as well as providing aliases for
  *	names specific to parsing.
+ *
+ *	The names for some operations were taken from Parsimmon.
  */
 
 module.exports = Parser;

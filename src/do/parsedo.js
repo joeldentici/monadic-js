@@ -190,6 +190,9 @@ const value = P.recursive(() =>
 
 /* Parse operators (expressions) */
 
+/* Thanks Parsimmon creators for the example on precedence parsing
+that I have adapted to use here */
+
 /**
  *	operators :: Map string (Parser Token any) -> Parser Token string
  *
