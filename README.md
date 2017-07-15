@@ -82,5 +82,5 @@ Applicative Do
   * Desugar do-notation into applicative bindings where appropriate.
   
 # More Info #
-Read the full API documentation [documentation.html](documentation).
+Read the full API documentation [documentation.html](documentation.html).
 
