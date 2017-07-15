@@ -38,6 +38,20 @@ class AsyncComputation extends CaseClass {
 	 *	whether it is successful or not.
 	 */
 	fork(s, f) {
+		let done = false;
+
+		const succ = x => {
+			if (!done) 
+				s(x);
+			done = true;
+		};
+
+		const fail = x => {
+			if (!done)
+				f(x);
+			done = true;
+		}
+
 		immediate(() => this.thunk(s, f));
 	}
 
@@ -85,7 +99,7 @@ class AsyncComputation extends CaseClass {
 			succ = later(succ);
 			fail = later(fail);
 
-			this.fork(v => f(v).fork(succ, fail), fail);
+			this.fork(chainIt(succ, fail, f), fail);
 		});
 	}
 
@@ -100,7 +114,7 @@ class AsyncComputation extends CaseClass {
 			succ = later(succ);
 			fail = later(fail);
 
-			this.fork(succ, e => f(e).fork(succ, fail));
+			this.fork(succ, chainIt(succ, fail, f));
 		});
 	}
 
@@ -123,7 +137,7 @@ class AsyncComputation extends CaseClass {
 			succ = later(succ);
 			fail = later(fail);
 
-			this.fork(compose(succ, f), fail);
+			this.fork(mapIt(succ, fail, f), fail);
 		});
 	}
 
@@ -151,7 +165,7 @@ class AsyncComputation extends CaseClass {
 			succ = later(succ);
 			fail = later(fail);
 
-			this.fork(succ, compose(fail, f));
+			this.fork(succ, mapIt(fail, fail, f));
 		});
 	}
 
@@ -279,13 +293,41 @@ function later(fn) {
 }
 
 /**
- *	compose :: (b -> c) -> (a -> b) -> a -> c
+ *	mapIt :: ((b -> ()), (e -> ()), (a -> b)) -> (a -> ())
  *
- *	Just normal old function composition.
+ *	Returns a new function that applies fn to whatever value
+ *	it gets and then applies cont to that. If an error occurs
+ *	in fn, then we will catch it and fail with it.
+ *
+ *	Note: This allows breaking out of the monadic control flow
+ *	by throwing in a map, but it is very important that we don't
+ *	bring down an entire application by one Async computation having
+ *	an error in it.
  */
-function compose(g, f) {
+function mapIt(cont, fail, fn) {
 	return function(x) {
-		return g(f(x));
+		try {
+			cont(fn(x));
+		}
+		catch (e) {
+			fail(e);
+		}
+	}
+}
+
+/**
+ *	chainIt :: ((b -> ()), (e -> ()), (a -> Async () e a)) -> (a -> ())
+ *
+ *	Performs the monadic chaining while catching any errors that occur.
+ */
+function chainIt(succ, fail, fn) {
+	return function(x) {
+		try {
+			fn(x).fork(succ, fail);
+		}
+		catch (e) {
+			fail(e);
+		}
 	}
 }
 
