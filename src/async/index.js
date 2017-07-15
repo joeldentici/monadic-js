@@ -236,12 +236,117 @@ class Async {
 			Just: r => Async.of(r),
 		});
 	}
+
+	/**
+	 *	parallel :: WebWorker -> ((a_0..a_n) -> b) -> (a_0..a_n) -> Async () Error b
+	 *
+	 *	Allows running functions in a fully parallel context.
+	 *
+	 *	Functions cannot be curried! If you try to use a curried
+	 *	function with this, the result will be a CurryingError.
+	 *	If you pass in a function that has already been curried,
+	 *	you will get a ReferenceError on its curried arguments.
+	 *	This is because the function is serialized to source and
+	 *	passed to the worker for execution. Serializing a curried
+	 *	function does not carry its environment, so it will have
+	 *	free variables in its body.
+	 *
+	 *	Applying parallel to a WebWorker implementation returns
+	 *	a function that can be used to wrap functions to run
+	 *	on another thread/process and return their results in
+	 *	an Async.
+	 *
+	 *	Note that you can achieve concurrency with CPU-bound
+	 *	computations by just using Async computations -- All
+	 *	you need to do is break them up into chains where you
+	 *	return results with Async.of or even just by chaining
+	 *	map from an initial Async.of() and turn iteration into
+	 *	recursion (you can also write most loops as higher order
+	 *	functions but that is inelegant). This works, but it isn't
+	 *	truly parallel as it doesn't utilize multiple CPU cores. It
+	 *	is essentially just time-sharing of coroutines (which can be
+	 *	faster than threads or processes for simple tasks).
+	 *
+	 *	Using this will give you truly parallel computation.
+	 */
+	static parallel(Worker) {
+		return fn => (...args) => {
+			const worker = new Worker(function() {
+				this.sendResult = function(result) {
+					this.postMessage({
+						type: 'result',
+						result
+					});
+				}
+
+				this.sendError = function(error) {
+					const cons = error.constructor.name;
+					const name = cons !== 'Object' ? cons : 'CurryingError';
+					const message = error.message || '';
+
+					this.postMessage({
+						type: 'error',
+						name,
+						message,
+					});
+				}
+
+				this.onmessage = function(event) {
+					const fn = eval('x => ' + event.data.function)();
+					const args = event.data.args;
+
+					try {
+						const res = fn(...args);
+						if (typeof res === 'function') {
+							this.sendError({
+								message: "Don't use curried functions with Async.parallel",
+							});
+						}
+						else {
+							this.sendResult(res);
+						}
+					}
+					catch (e) {
+						this.sendError(e);
+					}
+				}
+			});
+
+			return Async.create((succ, fail) => {
+				worker.onmessage = function(event) {
+					worker.terminate();
+
+					if (event.data.type === 'error') {
+						const message = event.data.message;
+						const name = event.data.name;
+
+						if (name === 'CurryingError')
+							fail(new CurryingError(message));
+						else
+							fail(global[name](message));
+					}
+					else if (event.data.type === 'result') {
+						succ(event.data.result);
+					}
+				}
+
+				worker.postMessage({
+					function: '' + fn,
+					args,
+				});
+			});
+		}
+	}
 }
 
 class NonExistenceError extends Error {
 	constructor(method) {
 		super(method + ': Received Maybe.Nothing');
 	}
+}
+
+class CurryingError extends Error {
+
 }
 
 
