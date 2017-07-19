@@ -114,6 +114,11 @@ Applicative Do
 Operational Monad
   * Similar to Free Monad, but works for all ADTs, not just Functors
   * We can more easily create interpreters for "compositions" of Operational Monads (sums of the underlying ADTs)
+  * This will be done before release on NPM
+  
+Proper fantasy-land methods
+  * Right now the fantasy-land methods are not 'namespaced' properly.
+  * This will be done before release on NPM
   
 ## More Info
 Read the full API documentation [documentation.html](documentation.html).
