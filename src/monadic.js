@@ -13,7 +13,6 @@
  */
 
 /* Export submodules */
-exports.Free = require('./free');
 exports.Utility = require('./utility.js');
 exports.Either = require('./either');
 exports.Maybe = require('./maybe');
