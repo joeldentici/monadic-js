@@ -237,7 +237,7 @@ Proper fantasy-land methods
   * This will be done before release on NPM
   
 ## More Info
-Read the full API documentation [documentation.html](documentation.html).
+Read the full API documentation [documentation.md](documentation.md).
 
 ## Contributing
 Contributions are welcome. Currently just follow the standard fork-commit-push-pull request model. If this gets attention and people want to collaborate I will start an organization for this and we can start coming up with actual guidelines for style and contribution.
