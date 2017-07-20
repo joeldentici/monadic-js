@@ -56,7 +56,12 @@ function generateIf(cond, tBranch, fBranch) {
 }
 
 function generateVar(lvalue, expr) {
-	return 'const ' + generate(lvalue) + ' = '
+	const dec = lvalue.case({
+		IdExpression: id => id.indexOf('.') > -1 ? '' : 'const ',
+		default: _ => 'const '
+	});
+
+	return dec + generate(lvalue) + ' = '
 	 + generate(expr);
 }
 

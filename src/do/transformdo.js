@@ -18,12 +18,12 @@ const CaseClass = require('js-helpers').CaseClass;
  */
 
 /**
- *	transform :: (AST, string, AST) -> AST
+ *	transform :: (AST, string) -> AST
  *
  *	Transforms the AST in the manner described
  *	above.
  */
-const transform = module.exports = function(ast, monad, next) {
+const transform = module.exports = function(ast, monad) {
 	return ast.case({
 		DoBlock: transformDoBlock,
 		UnaryOperatorExpression: transformUnaryExpr(monad),
@@ -95,7 +95,7 @@ function transformDoStatement(monad) {
 					(IdExpression('chain'));
 
 				const arr = ArrowExpression
-					(ArrowList([IdExpression(id)]))
+					(ArrowList([id]))
 					(Block(transform(next, monad)));
 
 				const app = BinaryOperatorExpression(
@@ -117,12 +117,24 @@ function transformDoStatement(monad) {
 }
 
 function createDoStatement(statements) {
-	if (statements.length === 1)
-		return UnaryOperatorExpression(
-			'Return')(statements[0]);
-	else
+	if (statements.length === 1) {
+		let statement;
+		if (statements[0].__type__ === 'DoBindingStatement') {
+			statement = statements[0].expr;
+		}
+		else if (statements[0].__type__ === 'VarBindingExpression') {
+			statement = statements[0].expr;
+		}
+		else {
+			statement = statements[0];
+		}
+
+		return UnaryOperatorExpression('Return')(statement);
+	}
+	else {
 		return DoStatement(statements[0])
 			(createDoStatement(statements.slice(1)));
+	}
 }
 
 /**

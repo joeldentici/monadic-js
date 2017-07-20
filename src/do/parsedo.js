@@ -404,8 +404,12 @@ const expr = operatorParser.trim(ignored).memoize(false);
 
 
 /* Parse do bindings */
+//l-value member access
+const dotL = identifier.sepBy(dot).map(ids => IdExpression(ids.join('.')));
+const baseL = idExpr.or(objectDestructure).or(arrayDestructure);
+
 //a regular variable binding
-const lvalue = idExpr.or(objectDestructure).or(arrayDestructure);
+const lvalue = dotL.or(baseL);
 const varBinding = P.recursive(() =>
 	P.of(VarBindingExpression)
 	 .app(lvalue)
@@ -417,7 +421,7 @@ const varBinding = P.recursive(() =>
 //a do binding
 const doBinding = P.recursive(() =>
 	P.of(DoBindingStatement)
-	 .app(identifier)
+	 .app(baseL)
 	 .skip(bind)
 	 .app(expr)
 	 .memoize(false, 9)
@@ -427,7 +431,7 @@ const doBinding = P.recursive(() =>
 const doSequence = P.recursive(() =>
 	P.of(DoBindingStatement)
 	 .skip(sequence)
-	 .app(P.of('_'))
+	 .app(P.of(IdExpression('_')))
 	 .app(expr)
 	 .memoize(false, 10)
 );
