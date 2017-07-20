@@ -10,7 +10,7 @@
   ],
   "main": "src/monadic.js",
   "scripts": {
-    "document": "hmdoc 'Monadic JS' src > documentation.html"
+    "document": "hmdoc 'Monadic JS' src markdown > documentation.md"
   },
   "dependencies": {
     "immutable": "^3.8.1"

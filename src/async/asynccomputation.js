@@ -2,7 +2,7 @@
 const CaseClass = require('js-helpers').CaseClass;
 
 /**
- *	Monadic.Async.AsyncComputation
+ *	MonadicJS.Async.AsyncComputation
  *	written by Joel Dentici
  *	on 6/25/2017
  *

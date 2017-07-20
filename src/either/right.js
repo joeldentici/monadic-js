@@ -2,7 +2,7 @@
 const CaseClass = require('js-helpers').CaseClass;
 
 /**
- *	Monadic.Either.Right
+ *	MonadicJS.Either.Right
  *	written by Joel Dentici
  *	on 6/20/2017
  *

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- *	Monadic
+ *	MonadicJS
  *	written by Joel Dentici
  *	on 6/20/2017
  *

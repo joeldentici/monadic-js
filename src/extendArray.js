@@ -1,6 +1,8 @@
 
 /**
  *	MonadicJS.ArrayExtensions
+ *	written by Joel Dentici
+ *	on 7/19/2017
  *
  *	Makes Array compatible with this library.
  *

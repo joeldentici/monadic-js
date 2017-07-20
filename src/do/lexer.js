@@ -1,5 +1,5 @@
 /**
- *	MonadicJS.do.Lexer
+ *	MonadicJS.Do.Lexer
  *	written by Joel Dentici
  *	on 7/1/2017
  *

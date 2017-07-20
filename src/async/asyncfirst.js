@@ -2,7 +2,7 @@
 const AsyncComputation = require('./asynccomputation.js');
 
 /**
- *	Monadic.Async.AsyncFirst
+ *	MonadicJS.Async.AsyncFirst
  *	written by Joel Dentici
  *	on 6/25/2017
  *

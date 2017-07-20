@@ -5,7 +5,7 @@ const path = require('path');
 
 
 /**
- *	MonadicJS.do
+ *	MonadicJS.Do
  *	written by Joel Dentici
  *	on 6/30/2017
  *

@@ -1,6 +1,8 @@
 
 /**
  *	MonadicJS.FunctionExtensions
+ *	written by Joel Dentici
+ *	on 7/19/2017
  *
  *	Makes Function compatible with this library.
  *

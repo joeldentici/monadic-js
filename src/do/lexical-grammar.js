@@ -1,5 +1,5 @@
 /**
- *	MonadicJS.do.LexicalGrammar
+ *	MonadicJS.Do.LexicalGrammar
  *	written by Joel Dentici
  *	on 7/1/2017
  *

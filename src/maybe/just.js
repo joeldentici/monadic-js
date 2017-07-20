@@ -2,7 +2,7 @@
 const CaseClass = require('js-helpers').CaseClass;
 
 /**
- *	Monadic.Maybe.Just
+ *	MonadicJS.Maybe.Just
  *	written by Joel Dentici
  *	on 6/20/2017
  *

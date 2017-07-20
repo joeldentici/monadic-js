@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- *	Monadic.Maybe
+ *	MonadicJS.Maybe
  *	written by Joel Dentici
  *	on 6/20/2017
  *

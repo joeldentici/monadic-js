@@ -3,7 +3,7 @@ const AsyncFirst = require('./asyncfirst.js');
 const {all} = require('../utility.js');
 
 /**
- *	Monadic.Async
+ *	MonadicJS.Async
  *	written by Joel Dentici
  *	on 6/25/2017
  *

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- *	Monadic.Either
+ *	MonadicJS.Either
  *	written by Joel Dentici
  *	on 6/20/2017
  *
