@@ -215,7 +215,9 @@ Free.combineTransformations = ts => ts.reduce(
  *
  *	<code>.setup :: MonadFail m => () -> m e ()</code> Perform actions prior to interpretation
  *
- *	<code>.transform :: MonadFail m => f x -> m e x</code> Transform an ADT to a monadic action
+ *	<code>.transform :: MonadFail m => (f x, f x -> m e x) -> m e x</code> Transform an ADT to a monadic action.
+ *	The second argument to transform contains all transformations and can be used with foldConcurrent to interpret
+ *	"sub-statements".
  *
  *	<code>.cleanupSuccess :: MonadFail m => x -> m e ()</code> Perform cleanup after successful interpretation
  *
@@ -253,7 +255,7 @@ Free.interpret = (m, ...interpreterCs) => x => {
 
 	//combine all transformations into one transformation
 	const transformations = Free.combineTransformations(
-		interpreters.map(i => x => i.transform(x))
+		interpreters.map(i => x => i.transform(x, transformations))
 	);
 
 	const res = setup() //perform setup actions
