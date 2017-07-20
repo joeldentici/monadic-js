@@ -197,7 +197,7 @@ class AsyncComputation extends CaseClass {
 			succ = later(succ);
 			fail = later(fail);
 
-			let value, fn;
+			let value, fn, count = 0;
 
 			//when both the value and this Async
 			//have finished, we apply the function
@@ -206,19 +206,21 @@ class AsyncComputation extends CaseClass {
 			//fails, so in that case we never call succ
 			//which is correct.
 			const run = () => {
-				if (fn && value)
+				if (count === 2)
 					succ(fn(value));
 			}
 
 			//run the value Async to get the value
 			av.fork(v => {
 				value = v;
+				count++;
 				run();
 			}, fail);
 
 			//run this Async to get the function
 			this.fork(f => {
 				fn = f;
+				count++;
 				run();
 			}, fail);
 		});
