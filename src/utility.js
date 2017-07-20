@@ -208,3 +208,15 @@ const replicateM = exports.replicateM = function(type, cnt = 0, a) {
 
 	return acc;
 }
+
+/**
+ *	forever :: Monad m => m a -> m ()
+ *
+ *	Repeat a monadic action an infinite number of
+ *	times. Note that this will never return a result
+ *	nor will it ever allow another action to be sequenced
+ *	after it.
+ */
+const forever = exports.forever = function(v) {
+	return v.chain(_ => forever(v));
+}
