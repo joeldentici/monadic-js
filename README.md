@@ -10,10 +10,10 @@ This libary provides implementations of some common monads. These include
   * Maybe
     * Represents a value or Nothing
     * Can be mapped into an Async
-  * Free
-    * Free monads over a Functor
-    * Do not use: This will be replaced by the operational monad
-    * Implement DSLs as monads
+  * ConcurrentFree
+    * Free monads over an ADT
+    * Implement DSLs as ADTs and compose instructions monadically
+    * Supports concurrent execution with Applicative binding
   * Parser
     * Applicative + Alternative + Monadic Parser combinators
     * Method names based on Parsimmon
@@ -110,11 +110,6 @@ The `O(log n)` part of the complexity comes from the fact that we are using pers
 ## Planned Features
 Applicative Do
   * Desugar do-notation into applicative bindings where appropriate.
-  
-Operational Monad
-  * Similar to Free Monad, but works for all ADTs, not just Functors
-  * We can more easily create interpreters for "compositions" of Operational Monads (sums of the underlying ADTs)
-  * This will be done before release on NPM
   
 Proper fantasy-land methods
   * Right now the fantasy-land methods are not 'namespaced' properly.
