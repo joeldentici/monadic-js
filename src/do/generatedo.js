@@ -79,6 +79,7 @@ const unaryOpText = {
 	Return: e => 'return ' + e,
 	Delete: e => 'delete ' + e,
 	TypeOf: e => 'typeof ' + e,
+	New: e => 'new ' + e,
 	PostDecrement: e => e + '--',
 	PostIncrement: e => e + '++',
 	Negate: e => '-' + e,

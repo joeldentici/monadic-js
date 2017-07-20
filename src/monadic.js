@@ -24,3 +24,4 @@ exports.loadDo = require('./do');
 exports.ArrayExtensions = require('./extendArray.js');
 exports.FunctionExtensions = require('./extendFunction.js');
 exports.ConcurrentFree = require('./concurrent-free');
+exports.ConcurrentFree.Control = require('./concurrent-free/control.js');

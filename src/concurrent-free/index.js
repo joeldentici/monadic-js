@@ -1,5 +1,4 @@
 const CaseClass = require('js-helpers').CaseClass;
-
 /**
  *	MonadicJS.ConcurrentFree
  *	written by Joel Dentici
@@ -98,6 +97,20 @@ class Free extends CaseClass {
 			Ap: (x, y) => y.foldConcurrent(m, t).app(x.foldConcurrent(m, t)),
 			Join: x => x.foldConcurrent(m, t).chain(y => y.foldConcurrent(m, t)),
 		});
+	}
+
+	/**
+	 *	alt :: Free f a -> Free f b -> Free f (a | b)
+	 *
+	 *	Alternative composition. During interpretation, we
+	 *	attempt to interpret this Free Monad. If that results
+	 *	in an error, we interpret the specified Free Monad instead.
+	 *
+	 *	You must include Control.interpreter in your interpreter
+	 *	list to use this, or you will get an error at runtime.
+	 */
+	alt(o) {
+		return tryF(this).catch(e => o);
 	}
 }
 
@@ -272,3 +285,21 @@ Free.interpret = (m, ...interpreterCs) => x => {
 }
 
 module.exports = Free;
+
+const {tryF, throwE} = require('./control.js');
+
+/**
+ *	empty :: Free f ()
+ *
+ *	A Free Monad with no value. Uses the control
+ *	primitive throwE to ensure that chained functions
+ *	will not be applied, thus satsifying <code>empty >>= f = empty</code>.
+ */
+Free.empty = throwE();
+
+/**
+ *	zero :: () -> Free f ()
+ *
+ *	Returns Free.empty
+ */
+Free.zero = () => Free.empty;
