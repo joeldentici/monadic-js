@@ -35,7 +35,7 @@ This library provides language extensions to normal JavaScript code by calling t
 you call this function you can use do notation and some useful operators for composing algebraic structures. This will always load the Array and Function extensions.
 
 ### Do notation:
-```
+```js
 do Monad {
   a <- MonadResultOne()
   b <- MonadResultTwo()
@@ -49,7 +49,7 @@ do Monad {
 Unlike Haskell's do-notation, sequenced actions must be explicitly bound to the next statement by using `do!`. This is to allow normal JS side effects to be performed in other statements. If this wasn't the case, then side-effecting non-monadic statements would need to be explicitly bound to a variable, or we would have to introduce something similar to `do!` to distinguish them. It makes more sense to distinguish monadic actions by notation than non-monadic side-effects, so that is what is done -- after all, we are in a do-notation block.
 
 ### Expressions:
-```
+```js
 const a = expr { fn <$> ap <*> ap2 };
 ```
 
@@ -58,7 +58,7 @@ Expression extensions can be used in a do-notation block, and a do-notation bloc
 ### If-Else
 Not shown above are if-else expressions which replace normal JS conditionals and the ternary operator inside the expression extensions/do-notation. These are expression based like the ternary operator, not statement based like an if-elseif-else in JS. Here is an example:
 
-```
+```js
 const a = expr { if (9 < 10) expr1 else expr2 } // a === expr1
 ```
 
@@ -67,7 +67,7 @@ Todo: Include link to document of grammar for do-notation/expression extensions.
 ## Parallel computation
 Functions can be execute in parallel using `Async.parallel`. This requires a WebWorker implementation to be installed by your project.
 
-```
+```js
 const monadic = require('monadic-js');
 const Worker = require('webworker-threads');
 const Async = monadic.Async;
