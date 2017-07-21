@@ -92,6 +92,7 @@ const _return = operator('Return');
 const _guard = operator('Guard');
 const _typeof = operator('TypeOf');
 const _new = operator('New');
+const negate = operator('Negate');
 const number = token('Number').map(Number);
 const identifier = token('Identifier');
 const string = token('String');
@@ -334,6 +335,7 @@ const ops = [
 		Delete: _delete,
 		TypeOf: _typeof,
 		New: _new,
+		LogicalNegate: negate,
 	})},
 	{type: infixRight, ops: operators({
 		Exponentiation: asterisk.then(asterisk)

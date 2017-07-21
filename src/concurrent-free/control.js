@@ -38,13 +38,24 @@ class ThrowE extends CaseClass {
 	}
 }
 
+class FromAsync extends CaseClass {
+	constructor(async) {
+		super();
+		this.async = async;
+	}
+
+	doCase(fn) {
+		return fn(this.async);
+	}
+}
+
 /**
  *	catch e a :: Object
  *
  *	A catch is an object providing a catch method
  *	that accepts a handler for errors.
  *
- *	<code>catch :: () -> (e -> Free f a) -> Free f a</code>
+ *	<code>catch :: () -> (e -> Free Control a) -> Free Control a</code>
  *
  *	You don't need to supply your own catch. It is what is
  *	returned by applying tryF. You supply a handler to that
@@ -52,7 +63,7 @@ class ThrowE extends CaseClass {
  */
 
 /**
- *	tryF :: Free f a -> catch e b -> Free f (a | b)
+ *	tryF :: Free f a -> catch e b -> Free Control (a | b)
  *
  *	Applying tryF to a Free Monad value will return
  *	a catch that accepts a handler for the errors that
@@ -69,11 +80,29 @@ const tryF = op => ({
 });
 
 /**
- *	throwE :: e -> Free f ()
+ *	throwE :: e -> Free Control ()
  *
  *	Throws an error.
  */
 const throwE = err => F.liftF(new ThrowE(err));
+
+/**
+ *	fromAsync :: Async c e a -> Free Control a
+ *
+ *	Useful if you will be interpreting to Async.
+ *
+ *	When interpreted into an Async, it just spits out
+ *	the Async it is holding
+ */
+const fromAsync = async => F.liftF(new FromAsync(async));
+
+/**
+ *	fromPromise :: Promise e a -> Free Control a
+ *
+ *	Wraps the promise in an Async and then applies
+ *	fromAsync to that.
+ */
+const fromPromise = promise => fromAsync(Async.fromPromise(promise));
 
 class Interpreter {
 	constructor() {}
@@ -93,6 +122,7 @@ class Interpreter {
 				return comp2;
 			},
 			ThrowE: err => Async.fail(err),
+			FromAsync: async => async,
 			default: () => {},
 		});
 	}
@@ -111,5 +141,7 @@ const interpreter = () => new Interpreter();
 module.exports = {
 	interpreter,
 	tryF,
-	throwE
+	throwE,
+	fromAsync,
+	fromPromise
 };

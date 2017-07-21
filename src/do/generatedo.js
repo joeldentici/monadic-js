@@ -86,6 +86,7 @@ const unaryOpText = {
 	Plus: e => '+' + e,
 	PreDecrement: e => '--' + e,
 	PreIncrement: e => '++' + e,
+	LogicalNegate: e => '!' + e,
 };
 
 function generateUnary(op, expr) {

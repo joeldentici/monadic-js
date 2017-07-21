@@ -190,6 +190,36 @@ const all = exports.all = function(type, xs) {
 }
 
 /**
+ *	seqMapM :: Monad m => (Type m, a -> m b) -> [a] -> m [b]
+ *
+ *	mapM restricted to lists and using monadic chaining.
+ */
+const seqMapM = exports.seqMapM = (type, fn) => xs => {
+	const add = mys => y => mys.map(ys => {
+		ys.push(y);
+		return ys;
+	});
+
+	return xs.reduce(
+		(acc, x) => fn(x).chain(add(acc)),
+		type.of([])
+	);
+}
+
+/**
+ *	seqAll :: Monad m => (Type m, [m a]) -> m [a]
+ *
+ *	Like all, but uses monadic sequencing instead of
+ *	applicative sequencing. This enforces sequential
+ *	execution for Monads whose Applicative instance
+ *	is concurrent. This is useful when prior actions
+ *	might
+ */
+const seqAll = exports.seqAll = function(type, xs) {
+	return seqMapM(type, id)(xs);
+}
+
+/**
  *	replicateM :: Applicative f => (Type f, int, f a) -> f [a]
  *
  *	Repeats the specified action cnt times and collects

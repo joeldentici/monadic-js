@@ -30,6 +30,7 @@ grammar["=="] = "Equal";
 grammar["="] = "Assignment";
 grammar["!=="] = "NEqual";
 grammar["!="] = "NEqual";
+grammar["!"] = "Negate";
 grammar[":"] = "Colon";
 grammar["&&"] = "LogicalAND";
 grammar["\\|\\|"] = "LogicalOR";
