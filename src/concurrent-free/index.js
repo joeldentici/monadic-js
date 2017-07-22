@@ -166,11 +166,11 @@ Free.Ap = fv => ft => new Ap(fv, ft);
 Free.Join = fvv => new Join(fvv);
 
 /**
- *	of :: a -> Free f a
+ *	unit/of :: a -> Free f a
  *
  *	Put a pure value into Free f context
  */
-Free.of = Free.Pure;
+Free.of = Free.unit = Free.Pure;
 
 /**
  *	liftF :: f a -> Free f a
