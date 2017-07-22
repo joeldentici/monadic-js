@@ -387,9 +387,6 @@ a Free f context
 
 Maps a function over the value in the
 Free monad.
-#### of :: a &#8594; Free f a
-
-Put a pure value into Free f context
 #### seqL :: Free f a &#8594; Free f b &#8594; Free f a
 
 Applicative sequencing from left-to-right,
@@ -398,6 +395,9 @@ keeping the left value.
 
 Applicative sequencing from left-to-right,
 keeping the right value.
+#### unit/of :: a &#8594; Free f a
+
+Put a pure value into Free f context
 #### zero :: () &#8594; Free f ()
 
 Returns Free.empty
