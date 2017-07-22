@@ -2,7 +2,7 @@ const {
 	BinaryOperatorExpression, UnaryOperatorExpression,
 	IdExpression, DoBlock, DoBindingStatement, ArrowList,
 	ArrowExpression, ArrayExpression, ObjectExpression,
-	ObjectBinding, IfElseBlock, VarBindingStatement,
+	ObjectBinding, IfElseBlock, VarBindingExpression,
 } = require('./doast.js');
 
 const CaseClass = require('js-helpers').CaseClass;
@@ -41,7 +41,7 @@ const transform = module.exports = function(ast, monad) {
 		),
 		ObjectBinding: (l, r) => ObjectBinding(l)
 			(transform(r, monad)),
-		VarBindingStatement: (l, e) => VarBindingStatement(l)
+		VarBindingExpression: (l, e) => VarBindingExpression(l)
 			(transform(e, monad)),
 		DoStatement: transformDoStatement(monad),
 		default: _ => ast,

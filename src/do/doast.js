@@ -74,7 +74,7 @@ class IdBinding extends CaseClass {
 	}
 
 	doCase(fn) {
-		return fn(this.expr);
+		return fn(this.member);
 	}
 }
 

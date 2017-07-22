@@ -49,17 +49,31 @@ const skipped = new Set([
 	'MultiLineComment'
 ]);
 /**
- *	isDo :: [Token] -> int -> bool
+ *	isDo :: ([Token], int) -> bool
  *
  *	Checks if we are at a possible do block.
- *
- *	We check for a "do" followed by an identifier
- *	skipping any whitespace and comments. This is
- *	to ensure that we don't accidentally consider
- *	a do-while loop to be a do-notation block.
  */
 function isDo(tokens, pos) {
-	if (tokens[pos].lexeme !== 'Do')
+	return isX(tokens, pos, 'Do', 'Identifier');
+}
+
+/**
+ *	isExpr :: ([Token], int) -> bool
+ *
+ *	Checks if we are at a possible expr block.
+ */
+function isExpr(tokens, pos) {
+	return isX(tokens, pos, 'Expr', 'LBrace');
+}
+
+/**
+ *	isX :: ([Token], int, string, string) -> bool
+ *
+ *	Checks if the current position is the beginning
+ *	of some type of phrase.
+ */
+function isX(tokens, pos, lexeme, nextLexeme) {
+	if (tokens[pos].lexeme !== lexeme)
 		return false;
 	pos++;
 
@@ -67,10 +81,10 @@ function isDo(tokens, pos) {
 		&& skipped.has(tokens[pos].lexeme))
 		pos++;
 
-	if (tokens[pos].lexeme !== 'Identifier')
+	if (tokens[pos].lexeme !== nextLexeme)
 		return false;
 
-	return true;
+	return true;	
 }
 
 /**
@@ -94,7 +108,7 @@ const transformJS = module.exports = function(source) {
 	while (pos < tokens.length) {
 		token = tokens[pos];
 
-		if (isDo(tokens, pos) || token.lexeme === 'Expr') {
+		if (isDo(tokens, pos) || isExpr(tokens, pos)) {
 			const res = transformBlock(tokens, pos);
 
 			const error = res.case({

@@ -418,15 +418,25 @@ Alternative composition with ConcurrentFree.
 A catch is an object providing a catch method
 that accepts a handler for errors.
 
-<code>catch :: () -> (e -> Free f a) -> Free f a</code>
+<code>catch :: () -> (e -> Free Control a) -> Free Control a</code>
 
 You don't need to supply your own catch. It is what is
 returned by applying tryF. You supply a handler to that
 catch. This is purely so try-catch looks like normal JS.
-#### throwE :: e &#8594; Free f ()
+#### fromAsync :: Async c e a &#8594; Free Control a
+
+Useful if you will be interpreting to Async.
+
+When interpreted into an Async, it just spits out
+the Async it is holding
+#### fromPromise :: Promise e a &#8594; Free Control a
+
+Wraps the promise in an Async and then applies
+fromAsync to that.
+#### throwE :: e &#8594; Free Control ()
 
 Throws an error.
-#### tryF :: Free f a &#8594; catch e b &#8594; Free f (a | b)
+#### tryF :: Free f a &#8594; catch e b &#8594; Free Control (a | b)
 
 Applying tryF to a Free Monad value will return
 a catch that accepts a handler for the errors that
@@ -604,14 +614,16 @@ scanning and immediate re-emitting until we find another
 block.
 
 The resulting output buffers are concatenated and returned.
-#### isDo :: [Token] &#8594; int &#8594; bool
+#### isDo :: ([Token], int) &#8594; bool
 
 Checks if we are at a possible do block.
+#### isExpr :: ([Token], int) &#8594; bool
 
-We check for a "do" followed by an identifier
-skipping any whitespace and comments. This is
-to ensure that we don't accidentally consider
-a do-while loop to be a do-notation block.
+Checks if we are at a possible expr block.
+#### isX :: ([Token], int, string, string) &#8594; bool
+
+Checks if the current position is the beginning
+of some type of phrase.
 #### transformJS :: string &#8594; Either string string
 
 Transforms the input source code in the manner
@@ -1298,6 +1310,16 @@ define this in terms of that
 
 Repeats the specified action cnt times and collects
 the results into a list.
+#### seqAll :: Monad m &#8658; (Type m, [m a]) &#8594; m [a]
+
+Like all, but uses monadic sequencing instead of
+applicative sequencing. This enforces sequential
+execution for Monads whose Applicative instance
+is concurrent. This is useful when prior actions
+might
+#### seqMapM :: Monad m &#8658; (Type m, a &#8594; m b) &#8594; [a] &#8594; m [b]
+
+mapM restricted to lists and using monadic chaining.
 #### unless :: Applicative f &#8658; (bool, f ()) &#8594; f ()
 
 Performs the specified action when the specified

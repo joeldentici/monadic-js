@@ -409,7 +409,7 @@ const expr = operatorParser.trim(ignored).memoize(false);
 
 /* Parse do bindings */
 //l-value member access
-const dotL = identifier.sepBy(dot).map(ids => IdExpression(ids.join('.')));
+const dotL = identifier.sepByPlus(dot).map(ids => IdExpression(ids.join('.')));
 const baseL = idExpr.or(objectDestructure).or(arrayDestructure);
 
 //a regular variable binding
