@@ -47,7 +47,7 @@ do Monad {
 }
 ```
 
-Unlike Haskell's do-notation, sequenced actions must be explicitly bound to the next statement by using `do!`. This is to allow normal JS side effects to be performed in other statements. If this wasn't the case, then side-effecting non-monadic statements would need to be explicitly bound to a variable, or we would have to introduce something similar to `do!` to distinguish them. It makes more sense to distinguish monadic actions by notation than non-monadic side-effects, so that is what is done -- after all, we are in a do-notation block.
+Unlike Haskell's do-notation, sequenced actions must be explicitly bound to the next statement by using `do!`. This is to allow normal JS side effects to be performed in other statements. If this wasn't the case, then side-effecting non-monadic statements would need to be explicitly bound to a variable, or we would have to introduce something similar to `do!` to distinguish them. It makes more sense to distinguish monadic actions by notation than non-monadic side-effects, so that is what is done -- after all, we are in a do-notation block. Note that this does not apply to the last statement in a block (you can still use do!, but it will automatically be removed), which should be a value in the monad.
 
 ### Expressions:
 ```js
@@ -103,19 +103,18 @@ If you plan on using this in your project, please read about the [caveats](docum
 ## Parser combinators
 Parser combinators are provided that roughly follow the interface of Parsimmon. Unlike Parsimmon, these parsers support memoization of results and use a modification to a not well known enough algorithm to support left-recursion in a top-down parse without grammar knowledge (which can be used to perform automated rewrites of the grammar for parser generators). This allows keeping the modularity of parser combinators and their other benefits (such as generic non-terminals that curry arguments, something that doesn't exist in formal grammar specifications), while supporting left-recursion.
 
-Informal analysis of theoretical complexity shows the following complexities for CFG (only a left-most parse is generated, but any deterministic CFG can be parsed, not just LL(\*) grammars) using only applicative composition and alternation (which is all that is needed to parse a CFG and probably the most efficient, though you can implement it in other manners). It is also assumed that you choose to memoize any parsers that may be applied more than once during the parse. The complexity is a function of `n`, the length of input to be parsed:
+These combinators were used to implement the parser for do-notation and expression blocks.
 
-  * Non left-recursive CFG: `O(n log n)`
-  * Left-recursive CFG: `O(n^2 log n)`
-  
-The `O(log n)` part of the complexity comes from the fact that we are using persistent maps for memoization and left-recursion detection. The `O(n)` part in the first case is due to the fact that we must apply each parser at most once to each input position due to memoization. The `O(n^2)` part in the second case is due to the fact that we may have to apply each parser to each input position `n` times (we detect left recursion at each input position, for each parser tried).
+TODO: Add example
 
-TODO: Move above to separate page and give examples
+Information on the computational complexity of these parsers can be found [here](documentation/parser-analysis.md)
 
 ## ConcurrentFree - DSLs from ADTs
-The Free Monad is a somewhat well known construction that allows recovering a Monad from a Functor by providing a construction to allow monadic composition of values in the Functor and a transformation that maps from a value in the Functor to a Monad. In practical terms, this means a Free monad separates the concerns of constructing a program and interpreting a program. It makes this so easy, in fact, that it is very useful for constructing effectful DSLs from pure computations.
+The Free Monad is a somewhat well known construction that allows recovering a Monad from a Functor. It does this by providing a mechanism to lift values of the Functor into values of the Free monad and a mechanism to monadically compose those lifted values. What you get though, is essentially a big nested nested tree whose leaves are values of the functor and whose intermediate nodes represent the monadic composition. To make this useful, you have to transform each of these nodes into another monad.
 
-The Free Monad can be generalized in many ways, such as relaxing the restriction that it be over a Functor. We can also add some extensions, such as mixing in the Free Applicative, which is nearly the same thing, but for recovering an Applicative. Combining these approaches carefully we wind up with ConcurrentFree, which is able to recover Functor, Applicative, and Monad from an ADT. This construction allows nesting applicative and monadic composition arbitrarily. Transformations from ConcurrentFree to another Monad preserve the applicative structure until monadic composition (chain/bind) is encountered. Because of this, if the semantics of the Applicative instance for the Monad you transform to are concurrent, then use of applicative composition with the Free Monad will be concurrent!
+This sounds a lot like constructing a program and then interpreting it. In fact, this is exactly what the construction is used for -- creating DSLs. The best part is you don't have to worry at all about how a program in the DSL is written, just writing an interpreter for the DSL.
+
+The Free Monad can be generalized in many ways, such as relaxing the restriction that it be over a Functor. We can also add some extensions, such as mixing in the Free Applicative, which is nearly the same thing, but for recovering an Applicative. Combining these approaches carefully we wind up with ConcurrentFree, which is able to recover Functor, Applicative, and Monad from an ADT. This construction allows nesting applicative and monadic composition arbitrarily. Transformations from ConcurrentFree to another Monad preserve the applicative structure until monadic composition (chain/bind) is encountered. Because of this, if the semantics of the Applicative instance for the Monad you transform to are concurrent, then use of applicative composition with ConcurrentFree will be concurrent!
 
 An extension is made to the traditional `foldMap` style interpretation of Free Monads that allows specifying interpreters that perform setup and cleanup operations in the output Monad. This is useful for implementing interpreters that require the creation and disposal of resources (for example, interacting with a database). Interpreters can also be combined, and since this is JavaScript, which lacks a static type system, we can compose operations from different Free Monads with no additional effort.
 
