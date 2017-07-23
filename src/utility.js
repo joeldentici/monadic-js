@@ -195,13 +195,13 @@ const all = exports.all = function(type, xs) {
  *	mapM restricted to lists and using monadic chaining.
  */
 const seqMapM = exports.seqMapM = (type, fn) => xs => {
-	const add = mys => y => mys.map(ys => {
+	const add = my => ys => my.map(y => {
 		ys.push(y);
 		return ys;
 	});
 
 	return xs.reduce(
-		(acc, x) => fn(x).chain(add(acc)),
+		(acc, x) => acc.chain(add(fn(x))),
 		type.of([])
 	);
 }
