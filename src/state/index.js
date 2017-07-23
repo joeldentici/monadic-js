@@ -64,6 +64,24 @@ class State_ {
 	}
 
 	/**
+	 *	app :: State s (a -> b) -> State s a -> State s b
+	 *
+	 *	Applicative application
+	 */
+	app(v) {
+		return this.chain(f => v.map(f));
+	}
+
+	/**
+	 *	ap :: State s a -> State s (a -> b) -> State s b
+	 *
+	 *	Applicative application for fantasy-land
+	 */
+	ap(f) {
+		return f.app(this);
+	}
+
+	/**
 	 *	chain :: State s a -> (a -> State s b) -> State s b
 	 *
 	 *	Alias for bind. Used for fantasy-land compliance.
