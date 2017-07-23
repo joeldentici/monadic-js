@@ -14,5 +14,8 @@
   },
   "dependencies": {
     "immutable": "^3.8.1"
+  },
+  "devDependencies": {
+    "fantasy-check": "^0.3.2"
   }
 }
