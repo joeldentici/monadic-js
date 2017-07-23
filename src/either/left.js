@@ -38,6 +38,24 @@ class Left extends CaseClass {
 	}
 
 	/**
+	 *	app :: Left (a -> b) -> Either a -> Left b
+	 *
+	 *	Applicative application
+	 */
+	app(v) {
+		return this.chain(f => v.map(f));
+	}
+
+	/**
+	 *	ap :: Left a -> Either (a -> b) -> Left b
+	 *
+	 *	Applicative application for fantasy-land
+	 */
+	ap(f) {
+		return f.app(this);
+	}
+
+	/**
 	 *	chain :: Left c -> (a -> Either c b) -> Left c
 	 *
 	 *	Alias for bind. Provided for fantasy-land compliance.

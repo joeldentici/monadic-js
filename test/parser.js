@@ -23,7 +23,7 @@ function processEscapes(str) {
   });
 }
 
-const ws = P.regex(/^\s*/)/*('whitespace');
+const ws = P.regex(/^\s*//*)('whitespace');
 
 const token = parser => parser.seqL(ws);
 

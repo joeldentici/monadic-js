@@ -49,6 +49,24 @@ class Right extends CaseClass {
 	}
 
 	/**
+	 *	app :: Right (a -> b) -> Either a -> Left b
+	 *
+	 *	Applicative application
+	 */
+	app(v) {
+		return this.chain(f => v.map(f));
+	}
+
+	/**
+	 *	ap :: Right a -> Either (a -> b) -> Left b
+	 *
+	 *	Applicative application for fantasy-land
+	 */
+	ap(f) {
+		return f.app(this);
+	}
+
+	/**
 	 *	doCase :: Right a -> (a -> b) -> b
 	 *
 	 *	Apply the function to the value contained

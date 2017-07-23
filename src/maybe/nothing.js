@@ -41,6 +41,24 @@ class Nothing extends CaseClass {
 	}
 
 	/**
+	 *	app :: Nothing -> Maybe a -> Nothing
+	 *
+	 *	Applicative application.
+	 */
+	app(v) {
+		return this.chain(f => v.map(f));
+	}
+
+	/**
+	 *	ap :: Nothing -> Maybe (a -> b) -> Nothing
+	 *
+	 *	Applicative application, for fantasy-land.
+	 */
+	ap(f) {
+		return f.app(this);
+	}
+
+	/**
 	 *	doCase :: Nothing -> (() -> b) -> b
 	 *
 	 *	Applies the function

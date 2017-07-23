@@ -49,6 +49,24 @@ class Just extends CaseClass {
 	}
 
 	/**
+	 *	app :: Just (a -> b) -> Maybe a -> Maybe b
+	 *
+	 *	Applicative application.
+	 */
+	app(v) {
+		return this.chain(f => v.map(f));
+	}
+
+	/**
+	 *	ap :: Just a -> Maybe (a -> b) -> Maybe b
+	 *
+	 *	Applicative application, for fantasy-land.
+	 */
+	ap(f) {
+		return f.app(this);
+	}
+
+	/**
 	 *	doCase :: Just a -> (a -> b) -> b
 	 *
 	 *	Apply the function to the value contained
