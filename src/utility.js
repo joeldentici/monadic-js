@@ -9,6 +9,8 @@
  *	alternatives, and just functional stuff in general.
  */
 
+/* Definitions for utility functions on algebraic structures */
+
 /**
  *	doM :: Monad m => (() -> Iterator) -> m a
  *
@@ -82,23 +84,6 @@ const guard = exports.guard = function(cond, alt) {
 	else
 		return alt.zero();
 }
-
-/**
- *	constant :: a -> () -> a
- *
- *	When applied to a value, returns a function
- *	that will always return that value, regardless
- *	of what it is applied to.
- */
-const constant = exports.constant = x => () => x;
-
-/**
- *	id :: a -> a
- *
- *	Always returns the value it is applied to.
- */
-const id = exports.id = x => x;
-
 
 /**
  *	foldrM :: Foldable t, Monad m => (Type m, (a, b) -> m b) -> b -> t a -> m b
@@ -249,4 +234,116 @@ const replicateM = exports.replicateM = function(type, cnt = 0, a) {
  */
 const forever = exports.forever = function(v) {
 	return v.chain(_ => forever(v));
+}
+
+/* Definitions for pure utility functions */
+
+/**
+ *	constant :: a -> () -> a
+ *
+ *	When applied to a value, returns a function
+ *	that will always return that value, regardless
+ *	of what it is applied to.
+ */
+const constant = exports.constant = x => () => x;
+
+/**
+ *	id :: a -> a
+ *
+ *	Always returns the value it is applied to.
+ */
+const id = exports.id = x => x;
+
+/**
+ *	CaseClass :: Object { case :: CaseClass -> Map string (...any -> any) -> any }
+ *
+ *	Objects that extend this class implement a doCase method that
+ *	calls a function with their members.
+ *
+ *	Case analysis is performed using caseOf when case is called
+ *	on the object.
+ */
+class CaseClass {
+	constructor(type) {
+		this.__type__ = type;
+	}
+
+	case(obj) {
+		return caseOf(this, obj);
+	}
+}
+exports.CaseClass = CaseClass;
+
+/**
+ *	caseOf :: (Object, Map string (any -> any)) -> any
+ *
+ *	Perform case analysis on an object, dispatching to
+ *	the appropriate type handler in the provided switch
+ *	map, or a default handler. If no default handler is
+ *	provided and no type matches, then a CaseAnalysisError
+ *	is thrown.
+ *
+ *	If the object is "caseable", then it has a doCase
+ *	method that can call the handler with its members.
+ *
+ *	Other objects are supported, but the object itself
+ *	will be passed to the handler (though ES6 object
+ *	destructuring can be pretty powerful there).
+ */
+const caseOf = exports.caseOf = function(obj, switchobj) {
+	const type = obj !== null && obj !== undefined
+		&& (obj.__type__ || obj.constructor.name);
+
+	//"caseable" + match
+	if (switchobj[type] &&
+		typeof obj.doCase === 'function') {
+		return obj.doCase(switchobj[type]);
+	}
+	//match
+	else if (switchobj[type]) {
+		return switchobj[type](obj);
+	}
+	//default case provided + no match
+	else if (switchobj['default']) {
+		return switchobj['default'](obj);
+	}
+	//no match
+	else {
+		throw new CaseAnalysisError(
+			"Non-exhaustive case analysis",
+			obj
+		);
+	}
+}
+
+/**
+ *	CaseAnalysisError :: Error
+ *
+ *	Thrown when an error occurs during case
+ *	analysis.
+ */
+class CaseAnalysisError extends Error {
+	constructor(message, object) {
+		super(message);
+		this.object = object;
+	}
+}
+
+/**
+ *	zip :: [a] -> [b] -> [(a,b)]
+ *
+ *	Zips corresponding elements from two
+ *	lists into a list of pairs of those elements.
+ */
+const zip = exports.zip = function(a, b) {
+	function zipAcc(a, b, acc) {
+		if (a.length === 0 || b.length === 0)
+			return acc;
+		else
+			return zipAcc(
+				a.slice(1),
+				b.slice(1),
+				acc.concat([[a[0], b[0]]]));
+	}
+	return zipAcc(a, b, []);	
 }

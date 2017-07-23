@@ -123,11 +123,10 @@ To sum the process up, you create an ADT and lift your ADT constructors to Free 
 Below is an example of a toy DSL implemented using ConcurrentFree, which demonstrates the preservation of concurrent applicative semantics. A real effectful library can easily be turned into a DSL this way.
 
 ```js
-const CaseClass = require('js-helpers').CaseClass;
 const monadic = require('monadic-js');
 const Async = monadic.Async;
 const F = monadic.ConcurrentFree;
-const {forever} = monadic.Utility;
+const {forever, CaseClass} = monadic.Utility;
 
 class Sleep extends CaseClass {
 	constructor(ms) {

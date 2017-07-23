@@ -5,7 +5,7 @@ const {
 	ObjectBinding, IfElseBlock, VarBindingExpression,
 } = require('./doast.js');
 
-const CaseClass = require('js-helpers').CaseClass;
+const CaseClass = require('../utility.js').CaseClass;
 
 /**
  *	MonadicJS.Do.Transform

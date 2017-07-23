@@ -1,4 +1,4 @@
-const CaseClass = require('js-helpers').CaseClass;
+const CaseClass = require('../utility.js').CaseClass;
 /**
  *	MonadicJS.ConcurrentFree
  *	written by Joel Dentici

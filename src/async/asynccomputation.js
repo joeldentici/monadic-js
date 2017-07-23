@@ -1,5 +1,5 @@
 'use strict';
-const CaseClass = require('js-helpers').CaseClass;
+const CaseClass = require('../utility.js').CaseClass;
 
 /**
  *	MonadicJS.Async.AsyncComputation
