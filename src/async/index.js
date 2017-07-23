@@ -92,7 +92,7 @@ class Async {
 	 *	compliance.
 	 */
 	static of(v) {
-		return this.unit(v);
+		return Async.unit(v);
 	}
 
 	/**

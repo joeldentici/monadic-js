@@ -15,7 +15,7 @@ const {equals} = require('../test-lib.js');
 const state = [];
 const runState = x => x.runState(state);
 
-exports.Either = {
+exports.State = {
 	'Applicative': applicative.laws(λ)(State, runState),
 	'Identity (Applicative)': applicative.identity(λ)(State, runState),
 	'Composition (Applicative)': applicative.composition(λ)(State, runState),

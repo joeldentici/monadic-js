@@ -52,7 +52,7 @@ class AsyncComputation extends CaseClass {
 			done = true;
 		}
 
-		immediate(() => this.thunk(s, f));
+		return AsyncComputation.schedule(() => this.thunk(s, f));
 	}
 
 	/**
@@ -279,18 +279,18 @@ class AsyncComputation extends CaseClass {
 }
 
 //use whatever is available for breaking up
-//execution
-const immediate = setImmediate || setTimeout;
+//execution (note we are calling with global this on purpose)
+AsyncComputation.schedule = x => (setImmediate || setTimeout)(x);
 
 /**
  *	later :: (a -> b) -> a -> ()
  *
  *	Wraps the application to the specified function
- *	in an application of the immediate function.
+ *	in an application of the scheduling function.
  */
 function later(fn) {
 	return function(x) {
-		return immediate(() => fn(x));
+		return AsyncComputation.schedule(() => fn(x));
 	}
 }
 
