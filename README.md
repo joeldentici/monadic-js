@@ -57,13 +57,21 @@ const a = expr { fn <$> ap <*> ap2 };
 Expression extensions can be used in a do-notation block, and a do-notation block can be the expression of an expression block. Despite this, expression blocks should only be used when you have a single expression you want to use directly from JS code, as nesting them in themeselves or in do-blocks is redundant and parentheses suffice for raising precedence. Do-blocks can be nested as well and should be where appropriate.
 
 ### If-Else
-Not shown above are if-else expressions which replace normal JS conditionals and the ternary operator inside the expression extensions/do-notation. These are expression based like the ternary operator, not statement based like an if-elseif-else in JS. Here is an example:
+Also provided are if-else expressions which replace normal JS conditionals and the ternary operator inside the expression extensions/do-notation. These are expression based like the ternary operator, not statement based like an if-elseif-else in JS. Here is an example:
 
 ```js
 const a = expr { if (9 < 10) expr1 else expr2 } // a === expr1
 ```
+Note that this implies that if-elseif-else statements cannot be used within do-notation or expression blocks.
 
-Todo: Include link to document of grammar for do-notation/expression extensions.
+### Caveats
+The parts of your code that live in a do-notation or expression block will be preprocessed by `monadic-js`. This is essentially source-to-source compilation of a mini-language to JavaScript. This mini-language is designed to embed well in JavaScript, so it provides similar syntax to JavaScript, and for the most part these constructs have the same semantics as they do in JavaScript.
+
+The parser does not handle the entire ES grammar as I did not want to spend the time dealing with all of its intricacies and then eliminate many constructs from being used in the extensions (such as iteration). Instead the parser is built around a grammar for a subset of JavaScript including all of the major operators with the same associativity and precedence levels they normally have, arrow functions with an expression body, destructuring (though I need to add multi-level destructuring, which shouldn't be difficult), and primitive type literals and constructors. Not included are function statements (normal function declarations), arrow functions with a statement block body, classes, loops, generator functions, void, assignment to identifiers (assignment to identifiers is const binding), the ternary conditional operator, computed member access l-value/binding (this will be supported eventually), and bitwise negation (I'm thinking about eliminating the other bitwise operators since >> has already been overloaded).
+
+These choices were made to try to encourage an immutable style and functional programming, but leave room for imperative programming because sometimes it is needed for efficiency.
+
+Click [here](documentation/extensions-grammar.md) to see the full grammar for these extensions, which serves as the main documentation for what can and can't be done in them.
 
 ## Parallel computation
 Functions can be execute in parallel using `Async.parallel`. This requires a WebWorker implementation to be installed by your project.
@@ -90,13 +98,7 @@ const res = expr { add <$> parFib(30) <*> parFib(40) <*> parFib(40) };
 
 res.fork(x => console.log(x), e => console.error(e));
 ```
-These functions are actually running in parallel, using kernel threads, as in on multiple cores (unless you are somehow on a machine that isn't multicore in 2017). If you run this on a single-core machine you will see normal old time-sharing/slicing concurrency, which is the same thing Async will get you on Node.js's single thread (and it might be slower because of context switching on a CPU-bound workload).
-
-As you can see, `Async.parallel` wraps a WebWorker implementation so it can wrap a function to execute in a WebWorker context (in this case using kernel threads) when it is applied. You can see this with the fibonacci sequence naive recursive definition being wrapped as parFib. This wrapped function's result is put into an Async context so that its uses, as well as the uses of other parallel functions, can be composed using the monadic and applicative interfaces of Async. You can see an example using applicative application with a curried 3-ary add function (using the expression extension operators).
-
-Keep in mind that if you use monadic composition (`.chain`,`.bind`,`>>=`,`>>`,`>=>`) then you will completely lose the benefits of parallel execution. This is because monadic composition is inherently sequential. Because the provided do-notation does not yet rewrite into applicative composition where possible, avoid using do-notation with `Async.parallel`. You can use expressions consisting of applicative composition of `Async.parallel` within do-notation or monadic composition chains. Doing so will preserve parallel execution across each applicative expression.
-
-The final thing to note is that a function used with `Async.parallel` cannot be partially applied and it cannot be higher-order in the sense of resulting in a function. In the first case we would lose the environment of the function on the main thread when sending it to the WebWorker and in the second case we would lose the environment of the resulting function when sending it back to the main thread. If you try to use a partially applied function you will receive a ReferenceError when you execute the async computation. If you try to return a function you will receive a CurryingError when you execute the async function. In either case, it is ensured that your async computation will fail rather than give bad results. Your function can be higher-order in the sense of having function parameters, but again this argument must not be partially applied, or you will get a ReferenceError. Finally note that the first two rules mean you must use functions that do not curry their parameters (they must take an argument list). None of this should be a problem since the main purpose of `Async.parallel` is to aid with the execution of CPU-bound functions.
+If you plan on using this in your project, please read about the [caveats](documentation/parallel.md).
 
 ## Parser combinators
 Parser combinators are provided that roughly follow the interface of Parsimmon. Unlike Parsimmon, these parsers support memoization of results and use a modification to a not well known enough algorithm to support left-recursion in a top-down parse without grammar knowledge (which can be used to perform automated rewrites of the grammar for parser generators). This allows keeping the modularity of parser combinators and their other benefits (such as generic non-terminals that curry arguments, something that doesn't exist in formal grammar specifications), while supporting left-recursion.
@@ -120,7 +122,7 @@ An extension is made to the traditional `foldMap` style interpretation of Free M
 To sum the process up, you create an ADT and lift your ADT constructors to Free Monad constructors with `ConcurrentFree.liftF`. You create an interpreter that performs any setup and cleanup operations in the output Monad, and which provides a transformation from your ADT to the output Monad. The transformation provides an (informal) operational semantics for your DSL.
 
 ### Example of ConcurrentFree
-Below is an example of a toy DSL implemented using ConcurrentFree, which demonstrates the preservation of concurrent applicative semantics. A real effectful library can easily be turned into a DSL this way.
+Below is an example of a toy DSL implemented using ConcurrentFree, which demonstrates the preservation of concurrent applicative semantics. An actual effectful library can easily be turned into a DSL this way.
 
 ```js
 const monadic = require('monadic-js');
@@ -236,7 +238,7 @@ Proper fantasy-land methods
   * This will be done before release on NPM
   
 ## More Info
-Read the full API documentation [documentation.md](documentation.md).
+Read the full API documentation [here](documentation/api.md).
 
 ## Contributing
 Contributions are welcome. Currently just follow the standard fork-commit-push-pull request model. If this gets attention and people want to collaborate I will start an organization for this and we can start coming up with actual guidelines for style and contribution.
