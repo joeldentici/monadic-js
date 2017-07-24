@@ -37,6 +37,144 @@ exports.Async = {
 	'Associativity (Monad)': monad.associativity(λ)(Async, runAsync),
 
 
-	/* Todo: Test other methods, error handling, etc. */
+	/* Test Async structure */
+	'Map Test': λ.check(
+		a => {
+			const expected = runAsync(Async.of(a + 5));
+			const result = runAsync(Async.of(a).map(x => x + 5));
 
+			const expected2 = runAsync(Async.fail("err"));
+			const result2 = runAsync(Async.fail('err').map(x => a));
+
+			return equals(result, expected) && equals(result2, expected2);
+		},
+		[Number]
+	),
+	'Map Fail Test': λ.check(
+		a => {
+			const expected = runAsync(Async.fail(a + 5));
+			const result = runAsync(Async.fail(a).mapFail(x => x + 5));
+
+			const expected2 = runAsync(Async.of(a));
+			const result2 = runAsync(Async.of(a).mapFail(x => x + 5));
+
+			return equals(result, expected) && equals(result2, expected2);
+		},
+		[Number]
+	),
+	'Chain Test': λ.check(
+		a => {
+			const expected = runAsync(Async.of(a + 5));
+			const result = runAsync(Async.of(a).chain(x => Async.of(x + 5)));
+
+			const expected2 = runAsync(Async.fail("err"));
+			const result2 = runAsync(Async.of(a).chain(x => Async.fail('err')));
+
+			const expected3 = runAsync(Async.fail("err"));
+			const result3 = runAsync(Async.fail("err").chain(x => Async.of(a)));
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& equals(result3, expected3);
+		},
+		[Number]
+	),
+	'Chain Fail Test': λ.check(
+		a => {
+			const expected = runAsync(Async.of(a));
+			const result = runAsync(Async.of(a).chainFail(x => Async.of(x + 5)));
+
+			const expected2 = runAsync(Async.fail("err"));
+			const result2 = runAsync(Async.fail(a).chainFail(x => Async.fail('err')));
+
+			const expected3 = runAsync(Async.of(a));
+			const result3 = runAsync(Async.fail("err").chainFail(x => Async.of(a)));
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& equals(result3, expected3);
+		},
+		[Number]
+	),
+	'SeqL Test': λ.check(
+		a => {
+			const expected = runAsync(Async.of(a));
+			const result = runAsync(Async.of(a).seqL(Async.of(5)));
+
+			const expected2 = runAsync(Async.fail("err"));
+			const result2 = runAsync(Async.of(a).seqL(Async.fail("err")));
+
+			const expected3 = runAsync(Async.fail("err"));
+			const result3 = runAsync(Async.fail("err").seqL(Async.of(a)));
+
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& equals(result3, expected3);
+		},
+		[Number]
+	),
+	'SeqR Test': λ.check(
+		a => {
+			const expected = runAsync(Async.of(5));
+			const result = runAsync(Async.of(a).seqR(Async.of(5)));
+
+			const expected2 = runAsync(Async.fail("err"));
+			const result2 = runAsync(Async.of(a).seqR(Async.fail("err")));
+
+			const expected3 = runAsync(Async.fail("err"));
+			const result3 = runAsync(Async.fail("err").seqR(Async.of(a)));
+
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& equals(result3, expected3);
+		},
+		[Number]
+	),
+	'App Test': λ.check(
+		a => {
+			const expected = runAsync(Async.of(a + 5));
+			const result = runAsync(Async.of(x => y => x + y).app(Async.of(a)).app(Async.of(5)));
+
+			const expected2 = runAsync(Async.fail("err"));
+			const result2 = runAsync(Async.of(x => y => x + y).app(Async.of(a)).app(Async.fail("err")));
+
+			const expected3 = runAsync(Async.fail("err"));
+			const result3 = runAsync(Async.of(x => y => x + y).app(Async.fail("err")).app(Async.of(a)));
+
+			const expected4 = runAsync(Async.fail("err"));
+			const result4 = runAsync(Async.fail("err").app(Async.of(a)).app(Async.of(5)));
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& equals(result3, expected3) && equals(result4, expected4);
+		},
+		[Number]
+	),
+	'Alt Test': λ.check(
+		a => {
+			const expected = runAsync(Async.of(a));
+			const result = runAsync(Async.of(a).alt(Async.of(5)));
+
+			const expected2 = runAsync(Async.of(a));
+			const result2 = runAsync(Async.fail("err").alt(Async.of(a)));
+
+			return equals(result, expected) && equals(result2, expected2);
+		},
+		[Number]
+	),
+	'tap Test': λ.check(
+		a => {
+			const expected = runAsync(Async.of(a));
+			const result = runAsync(Async.of(a).tap(x => x + 7));
+
+			return equals(result, expected);
+		},
+		[Number]
+	),
+	'tap fail Test': λ.check(
+		a => {
+			const expected = runAsync(Async.fail(a));
+			const result = runAsync(Async.fail(a).tapFail(x => x + 7));
+
+			return equals(result, expected);
+		},
+		[Number]
+	),
 };
