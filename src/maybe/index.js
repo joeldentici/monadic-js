@@ -11,15 +11,24 @@
 
 
 
-exports.Just = require('./just.js');
-exports.Nothing = require('./nothing.js');
+const {constructJust, Just} = require('./just.js');
+exports.Just = constructJust;
+const Nothing = require('./nothing.js');
+exports.Nothing = Nothing;
 
 /**
  *	unit/of :: a -> Just a
  *
  *	Puts a value into Maybe context.
  */
-exports.of = exports.unit = exports.Just;
+Just.of = Nothing.constructor.of = exports.of = exports.unit = exports.Just;
+
+exports.empty = Nothing;
+
+/**
+ *	zero :: () -> Nothing
+ */
+Just.zero = Nothing.constructor.zero = exports.zero = () => Nothing;
 
 /**
  *	nullable :: a -> Maybe a

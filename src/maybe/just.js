@@ -77,4 +77,7 @@ class Just extends CaseClass {
 	}
 }
 
-module.exports = (a) => new Just(a);
+module.exports = {
+	constructJust: (a) => new Just(a),
+	Just
+};
