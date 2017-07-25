@@ -46,7 +46,7 @@ class Nothing extends CaseClass {
 	 *	Applicative application.
 	 */
 	app(v) {
-		return this.chain(f => v.map(f));
+		return this;
 	}
 
 	/**

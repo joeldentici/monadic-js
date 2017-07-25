@@ -8,6 +8,7 @@ const State = require('../src/state');
 
 /* This old version of fantasy-check's laws are using an outdated spec for Applicative,
  even though it is technically the right way. So we need to make ap = app */
+const oldAp = State.of().constructor.prototype.ap;
 State.of('').constructor.prototype.ap = State.of('').constructor.prototype.app;
 
 const {equals} = require('../test-lib.js');
@@ -58,4 +59,14 @@ exports.State = {
 		},
 		[Number, Array]
 	),
+	'ap test': λ.check(
+		a => {
+			State.of().constructor.prototype.ap = oldAp;
+
+			const [val, out] = State.of(a).ap(State.of(x => x + 1)).runState([]);
+
+			return equals(val, a + 1) && equals(out, []);
+		},
+		[Number]
+	)
 }

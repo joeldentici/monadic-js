@@ -38,16 +38,16 @@ class Left extends CaseClass {
 	}
 
 	/**
-	 *	app :: Left (a -> b) -> Either a -> Left b
+	 *	app :: Left e () -> Either e a -> Left e ()
 	 *
 	 *	Applicative application
 	 */
 	app(v) {
-		return this.chain(f => v.map(f));
+		return this;
 	}
 
 	/**
-	 *	ap :: Left a -> Either (a -> b) -> Left b
+	 *	ap :: Left a -> Either e (a -> b) -> Left a
 	 *
 	 *	Applicative application for fantasy-land
 	 */

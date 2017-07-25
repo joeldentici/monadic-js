@@ -8,6 +8,7 @@ const Maybe = require('../src/maybe');
 
 /* This old version of fantasy-check's laws are using an outdated spec for Applicative,
  even though it is technically the right way. So we need to make ap = app */
+const oldAp = Maybe.of().constructor.prototype.ap;
 Maybe.of('').constructor.prototype.ap = Maybe.of('').constructor.prototype.app;
 
 const {equals} = require('../test-lib.js');
@@ -72,6 +73,43 @@ exports.Maybe = {
 			const result = Maybe.Nothing.chain(fn);
 
 			return equals(result, expected);
+		},
+		[Number]
+	),
+	'old ap': λ.check(
+		a => {
+
+ 			Maybe.of().constructor.prototype.ap = oldAp;
+
+			const fn = x => x + 1;
+
+			const expected = Maybe.of(fn(a));
+			const result = Maybe.of(a).ap(Maybe.of(fn));
+			const result2 = Maybe.Nothing.ap(Maybe.of(fn));
+
+			return equals(result, expected) && equals(result2, Maybe.Nothing);
+		},
+		[Number]
+	),
+	'case': λ.check(
+		a => {
+			const expected = a;
+			const result1 = Maybe.of(a).doCase(x => x);
+			const result2 = Maybe.Nothing.doCase(() => undefined);
+
+			return equals(result1, expected) && equals(result2, undefined);
+		},
+		[Number]
+	),
+	'nullable': λ.check(
+		a => {
+			const expected = Maybe.of(a);
+			const result = Maybe.nullable(a);
+			const result2 = Maybe.nullable(undefined);
+			const result3 = Maybe.nullable(null);
+
+			return equals(result, expected) && equals(result2, Maybe.Nothing)
+			&& equals(result3, Maybe.Nothing);
 		},
 		[Number]
 	),

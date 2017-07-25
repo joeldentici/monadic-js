@@ -8,6 +8,8 @@ const Either = require('../src/either');
 
 /* This old version of fantasy-check's laws are using an outdated spec for Applicative,
  even though it is technically the right way. So we need to make ap = app */
+ const oldAp = Either.of().constructor.prototype.ap;
+ const oldLeftAp = Either.Left().constructor.prototype.ap;
 Either.of('').constructor.prototype.ap = Either.of('').constructor.prototype.app;
 Either.Left('').constructor.prototype.ap = Either.Left('').constructor.prototype.app;
 
@@ -73,6 +75,34 @@ exports.Either = {
 			const result = Either.Left(a).chain(fn);
 
 			return equals(result, expected);
+		},
+		[Number]
+	),
+	'old ap': λ.check(
+		a => {
+
+ 			Either.of().constructor.prototype.ap = oldAp;
+ 			Either.Left().constructor.prototype.ap = oldLeftAp;
+
+			const fn = x => x + 1;
+
+			const expected = Either.of(fn(a));
+			const result = Either.of(a).ap(Either.of(fn));
+			const result2 = Either.Left(a).ap(Either.of(fn));
+			const result3 = Either.Left(a).app(Either.of(a));
+
+			return equals(result, expected) && equals(result2, Either.Left(a))
+				&& equals(result3, Either.Left(a));
+		},
+		[Number]
+	),
+	'case': λ.check(
+		a => {
+			const expected = a;
+			const result1 = Either.of(a).doCase(x => x);
+			const result2 = Either.Left(a).doCase(x => x);
+
+			return equals(result1, expected) && equals(result2, expected);
 		},
 		[Number]
 	),

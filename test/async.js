@@ -11,6 +11,7 @@ AsyncComputation.schedule = x => x();
 
 /* This old version of fantasy-check's laws are using an outdated spec for Applicative,
  even though it is technically the right way. So we need to make ap = app */
+const oldAp = Async.of().constructor.prototype.ap;
 Async.of('').constructor.prototype.ap = Async.of('').constructor.prototype.app;
 
 const {equals} = require('../test-lib.js');
@@ -246,11 +247,26 @@ exports.Async = {
 			const result3 = Async.first(Async.create(fn), Async.of(5)).run();
 			const result4 = Async.first(Async.fail(a), Async.of(5), Async.fail(5)).run();
 
+			const result5 = Async.first(Async.fail(a)).doCase(x => x[0]).run();
+			const expected5 = Async.fail(a).run();
+
 			return equals(result, expected) && equals(result2, expected)
 				&& equals(result3[0], expected) && equals(result3[1], undefined)
 				&& equals(result4[0], expected) && equals(result4[1], undefined)
-				&& equals(result4[2], undefined);
+				&& equals(result4[2], undefined) && equals(result5, expected5);
 		},
 		[Number]
 	),
+	'old ap': λ.check(
+		a => {
+			const fn = x => x + 1;
+			Async.of('').constructor.prototype.ap = oldAp;
+
+			const expected = runAsync(Async.of(fn(a)));
+			const result = runAsync(Async.of(a).ap(Async.of(fn)));
+
+			return equals(result, expected);
+		},
+		[Number]
+	)
 };
