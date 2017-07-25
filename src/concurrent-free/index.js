@@ -24,7 +24,7 @@ class Free extends CaseClass {
 		return this.case({
 			Pure: a => Free.Pure(f(a)),
 			Lift: (x, g) => Free.Lift(x)(c(f, g)),
-			Ap: (x, y) => Free.Ap(x)(y.map(a => a.map(f))),
+			Ap: (x, y) => Free.Ap(x)(y.map(a => x => f(a(x)))),
 			Join: x => Free.Join(x.map(a => a.map(f))),
 		});
 	}
@@ -271,9 +271,11 @@ Free.interpret = (m, ...interpreterCs) => x => {
 		interpreters.map(i => x => i.transform(x, transformations))
 	);
 
+	
+
 	const res = setup() //perform setup actions
 	//transform Free monad
-	     .chain(_ => x.foldConcurrent(m, transformations))
+	     .chain(_ => Free.foldConcurrent(m)(transformations)(x))
 	//cleanup in case of an error
 	     .chainFail(e => failCleanup(e)
 	     //if cleanup succeeds, propagate original error

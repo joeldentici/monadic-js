@@ -5,7 +5,7 @@ const monad = require('fantasy-check/src/laws/monad');
 
 const {identity, constant} = require('fantasy-combinators');
 const F = require('../src/monadic.js').ConcurrentFree;
-const {interpreter: controlInterpreter} = F.Control;
+const {interpreter: controlInterpreter, tryF, throwE, fromAsync} = F.Control;
 const Async = require('../src/async');
 const AsyncComputation = require('../src/async/asynccomputation.js');
 const CaseClass = require('../src/utility.js').CaseClass;
@@ -15,6 +15,7 @@ AsyncComputation.schedule = x => x();
 /* This old version of fantasy-check's laws are using an outdated spec for Applicative,
  even though it is technically the right way. So we need to make ap = app */
 Async.of('').constructor.prototype.ap = Async.of('').constructor.prototype.app;
+const oldAp = F.prototype.ap;
 F.prototype.ap = F.prototype.app;
 
 const {equals} = require('../test-lib.js');
@@ -48,8 +49,16 @@ class GetInput extends CaseClass {
 	}
 }
 
+class Bad extends CaseClass {
+
+	doCase(fn) {
+		return fn();
+	}
+}
+
 const print = msg => F.liftF(new Print(msg));
 const getInput = F.liftF(new GetInput());
+const bad = F.liftF(new Bad());
 
 class Interpreter {
 	constructor(msgs) {
@@ -119,7 +128,7 @@ exports.ConcurrentFree = {
 			const msgs = [];
 			const run = getRun(msgs);
 
-			const prog = print('Hey').chain(_ => getInput);
+			const prog = print('Hey').chain(_ => getInput).map(identity);
 
 			const expected = 'FakeInput';
 			const result = run(prog);
@@ -129,6 +138,77 @@ exports.ConcurrentFree = {
 			return equals(result, expected) && equals(msgs, expectedMsgs);
 		},
 		[Number]
-	)
+	),
+	'SeqL/R': λ.check(
+		a => {
+			const msgs = [];
+			const run = getRun(msgs);
+
+			const prog = print('Hey').seqL(getInput);
+			const prog2 = print('Hey').seqR(getInput).map(identity);
+
+			const expected = undefined;
+			const result = run(prog);
+
+			const expected2 = 'FakeInput';
+			const result2 = run(prog2);
+
+			return equals(result, expected) && equals(result2, expected2)
+		},
+		[Number]
+	),
+	'alt': λ.check(
+		a => {
+			const msgs = [];
+			const run = getRun(msgs);
+
+			const prog = F.of(a).alt(F.of('Hey'));
+			const prog2 = throwE('Err').alt(F.of(a));
+
+			const expected = a;
+			const result = run(prog);
+
+			const expected2 = a;
+			const result2 = run(prog2);
+
+			const expected3 = undefined;
+			const result3 = run(F.zero().chain(_ => F.of(a)));
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& equals(result3, expected3);
+		},
+		[Number]
+	),
+	'no interpreter': λ.check(
+		a => {
+			const msgs = [];
+			const run = getRun(msgs);
+
+			const prog = bad;
+
+			const expected = 'No transformation for';
+			const result = run(prog);
+
+			return result.message.startsWith(expected);
+		},
+		[Number]
+	),
+	'ap': λ.check(
+		a => {
+			const msgs = [];
+			const run = getRun(msgs);
+
+			F.prototype.ap = oldAp;
+
+			//const prog = F.of(a).ap(F.of(x => x + 1));
+			const prog = fromAsync(Async.of(a)).ap(F.of(x => x + 1));
+
+			const expected = a + 1;
+			const result = run(prog);
+
+			return equals(result, expected);
+		},
+		[Number]
+	),
 
 };
