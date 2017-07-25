@@ -12,8 +12,8 @@
   "scripts": {
     "document": "hmdoc 'Monadic JS' src markdown > documentation/api.md",
     "testit": "nodeunit test",
-    "coveragelcov": "nyc --reporter=lcov npm testit",
-    "coverage": "nyc npm testit",
+    "coveragelcov": "nyc --reporter=lcov npm run testit",
+    "coverage": "nyc npm run testit",
     "coveralls": "npm run coveragelcov && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "test": "npm run coveralls"
   },
