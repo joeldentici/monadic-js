@@ -1,5 +1,6 @@
 # monadic-js #
 [![Build Status](https://travis-ci.org/joeldentici/monadic-js.svg?branch=master)](https://travis-ci.org/joeldentici/monadic-js)
+[![Coverage Status](https://coveralls.io/repos/github/joeldentici/monadic-js/badge.svg?branch=master)](https://coveralls.io/github/joeldentici/monadic-js?branch=master)
 
 This libary provides implementations of some common monads. These include
 
