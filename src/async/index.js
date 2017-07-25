@@ -55,7 +55,7 @@ class Async {
 					else succ(val);
 				}]);
 
-				fn(...allArgs);
+				return fn(...allArgs);
 			});
 		}
 	}
@@ -74,19 +74,19 @@ class Async {
 	}
 
 	/**
-	 *	unit :: a -> Async () () a
+	 *	unit :: a -> Async a () a
 	 *
 	 *	Puts a value into the context of
 	 *	an Async computation.
 	 */
 	static unit(v) {
 		return Async.create((succ, fail) => {
-			succ(v);
+			return succ(v);
 		});
 	}
 
 	/**
-	 *	of :: a -> Async () () a
+	 *	of :: a -> Async a () a
 	 *
 	 *	Alias for unit. Provided for fantasy-land
 	 *	compliance.
@@ -96,14 +96,14 @@ class Async {
 	}
 
 	/**
-	 *	fail :: e -> Async () e ()
+	 *	fail :: e -> Async e e ()
 	 *
 	 *	Returns an Async computation that failed
 	 *	for the specified reason.
 	 */
 	static fail(e) {
 		return Async.create((succ, fail) => {
-			fail(e);
+			return fail(e);
 		});
 	}
 

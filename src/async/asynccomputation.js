@@ -39,20 +39,23 @@ class AsyncComputation extends CaseClass {
 	 */
 	fork(s, f) {
 		let done = false;
+		let v;
 
 		const succ = x => {
 			if (!done) 
-				s(x);
+				v = s(x);
 			done = true;
+			return v;
 		};
 
 		const fail = x => {
 			if (!done)
-				f(x);
+				v = f(x);
 			done = true;
+			return v;
 		}
 
-		return AsyncComputation.schedule(() => this.thunk(s, f));
+		return AsyncComputation.schedule(() => this.thunk(succ, fail));
 	}
 
 	/**
@@ -99,7 +102,7 @@ class AsyncComputation extends CaseClass {
 			succ = later(succ);
 			fail = later(fail);
 
-			this.fork(chainIt(succ, fail, f), fail);
+			return this.fork(chainIt(succ, fail, f), fail);
 		});
 	}
 
@@ -114,7 +117,7 @@ class AsyncComputation extends CaseClass {
 			succ = later(succ);
 			fail = later(fail);
 
-			this.fork(succ, chainIt(succ, fail, f));
+			return this.fork(succ, chainIt(succ, fail, f));
 		});
 	}
 
@@ -137,7 +140,7 @@ class AsyncComputation extends CaseClass {
 			succ = later(succ);
 			fail = later(fail);
 
-			this.fork(mapIt(succ, fail, f), fail);
+			return this.fork(mapIt(succ, fail, f), fail);
 		});
 	}
 
@@ -165,7 +168,7 @@ class AsyncComputation extends CaseClass {
 			succ = later(succ);
 			fail = later(fail);
 
-			this.fork(succ, mapIt(fail, fail, f));
+			return this.fork(succ, mapIt(fail, fail, f));
 		});
 	}
 
@@ -207,22 +210,24 @@ class AsyncComputation extends CaseClass {
 			//which is correct.
 			const run = () => {
 				if (count === 2)
-					succ(fn(value));
+					return succ(fn(value));
 			}
 
-			//run the value Async to get the value
-			av.fork(v => {
-				value = v;
-				count++;
-				run();
-			}, fail);
-
 			//run this Async to get the function
-			this.fork(f => {
+			const v1 = this.fork(f => {
 				fn = f;
 				count++;
-				run();
+				return run();
 			}, fail);
+
+			//run the value Async to get the value
+			const v2 = av.fork(v => {
+				value = v;
+				count++;
+				return run();
+			}, fail);
+
+			return v1 || v2;
 		});
 	}
 
@@ -309,10 +314,10 @@ function later(fn) {
 function mapIt(cont, fail, fn) {
 	return function(x) {
 		try {
-			cont(fn(x));
+			return cont(fn(x));
 		}
 		catch (e) {
-			fail(e);
+			return fail(e);
 		}
 	}
 }
@@ -325,10 +330,10 @@ function mapIt(cont, fail, fn) {
 function chainIt(succ, fail, fn) {
 	return function(x) {
 		try {
-			fn(x).fork(succ, fail);
+			return fn(x).fork(succ, fail);
 		}
 		catch (e) {
-			fail(e);
+			return fail(e);
 		}
 	}
 }
