@@ -244,9 +244,12 @@ exports.Async = {
 			const result2 = Async.create(fn).run();
 
 			const result3 = Async.first(Async.create(fn), Async.of(5)).run();
+			const result4 = Async.first(Async.fail(a), Async.of(5), Async.fail(5)).run();
 
 			return equals(result, expected) && equals(result2, expected)
-				&& equals(result3[0], expected) && equals(result3[1], undefined);
+				&& equals(result3[0], expected) && equals(result3[1], undefined)
+				&& equals(result4[0], expected) && equals(result4[1], undefined)
+				&& equals(result4[2], undefined);
 		},
 		[Number]
 	),
