@@ -7,6 +7,7 @@ const {identity, constant} = require('fantasy-combinators');
 const Async = require('../src/async');
 const AsyncComputation = require('../src/async/asynccomputation.js');
 //for testing, we will schedule computations to actually run immediately!
+const oldSchedule = AsyncComputation.schedule;
 AsyncComputation.schedule = x => x();
 
 /* This old version of fantasy-check's laws are using an outdated spec for Applicative,
@@ -16,8 +17,11 @@ Async.of('').constructor.prototype.ap = Async.of('').constructor.prototype.app;
 
 const {equals} = require('../test-lib.js');
 
+const Maybe = require('../src/maybe');
+const Either = require('../src/either');
+
 function runAsync(comp) {
-	return comp.fork(identity, identity);
+	return Async.fork(comp, identity, identity);
 }
 
 exports.Async = {
@@ -54,7 +58,7 @@ exports.Async = {
 	'Map Fail Test': λ.check(
 		a => {
 			const expected = runAsync(Async.fail(a + 5));
-			const result = runAsync(Async.fail(a).mapFail(x => x + 5));
+			const result = runAsync(Async.throwE(a).mapFail(x => x + 5));
 
 			const expected2 = runAsync(Async.of(a));
 			const result2 = runAsync(Async.of(a).mapFail(x => x + 5));
@@ -248,7 +252,7 @@ exports.Async = {
 			const result4 = Async.first(Async.fail(a), Async.of(5), Async.fail(5)).run();
 
 			const result5 = Async.first(Async.fail(a)).doCase(x => x[0]).run();
-			const expected5 = Async.fail(a).run();
+			const expected5 = Async.run(Async.fail(a));
 
 			return equals(result, expected) && equals(result2, expected)
 				&& equals(result3[0], expected) && equals(result3[1], undefined)
@@ -268,5 +272,159 @@ exports.Async = {
 			return equals(result, expected);
 		},
 		[Number]
-	)
+	),
+	'all': λ.check(
+		() => {
+			const expected = [1];
+			const result = runAsync(Async.all([Async.of(1)]));
+			const result2 = runAsync(Async.all(Async.of(1)));
+
+			return equals(result, expected) && equals(result2, expected);
+		},
+		[]
+	),
+	'try': λ.check(
+		() => {
+			const expected = 1;
+			const result = runAsync(Async.try(Async.of(1)));
+
+			return equals(result, expected);
+		},
+		[]
+	),
+	'fromMaybe/Either': λ.check(
+		() => {
+			const expected = 1;
+			const result = runAsync(Async.fromMaybe(Maybe.of(1)));
+			const expected2 = 'Async.fromMaybe: Received Maybe.Nothing';
+			const result2 = runAsync(Async.fromMaybe(Maybe.Nothing)).message;
+
+			const result3 = runAsync(Async.fromEither(Either.of(1)));
+			const result4 = runAsync(Async.fromEither(Either.Left(expected2)));
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& equals(result3, expected) && equals(result4, expected2);
+		},
+		[]
+	),
+	'wrap': λ.check(
+		() => {
+			const fn = (a, b, cb) => cb(null, a + b);
+			const fn2 = (a, b, cb) => cb("err");
+
+			const afn = Async.wrap(fn);
+			const afn2 = Async.wrap(fn2);
+
+			const result = runAsync(afn(1,2));
+			const result2 = runAsync(afn2(1,2));
+
+			const expected = 3;
+			const expected2 = 'err';
+
+			return equals(result, expected) && equals(result2, expected2);
+		}, []
+	),
+	'parallel': λ.check(
+		() => {
+			const par = Async.parallel(Worker);
+
+			const test = x => x + 1;
+			const parTest = par(test);
+
+			const expected = test(1);
+			const result = runAsync(parTest(1));
+
+
+			const test2 = (x => y => x + y)(5);
+			const parTest2 = par(test2);
+
+			const expected2 = 'x is not defined';
+			const result2 = runAsync(parTest2(5)).message;
+
+			const test3 = x => y => x + y;
+			const parTest3 = par(test3);
+
+			const expected3 = "Don't use curried functions with Async.parallel";
+			const result3 = runAsync(parTest3(5)).message;
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& equals(result3, expected3);
+		}, []
+	),
+	'fromPromise/await': test => {
+		AsyncComputation.schedule = oldSchedule;
+
+		const a1 = Async.fromPromise(Promise.resolve(5));
+		const pf = Promise.reject(6);
+		pf.catch(e => e);
+		const a2 = Async.fromPromise(pf);
+
+		a1.fork(x => {
+			test.equals(x, 5);
+			a2.fork(x => x, x => {
+				test.equals(x, 6);
+				test.done();
+			});
+		}, x => x);
+	},
+	'toPromise': test => {
+		AsyncComputation.schedule = oldSchedule;
+
+		const p1 = Async.toPromise(Async.of(5));
+		const p2 = Async.toPromise(Async.fail(6));
+
+		p1.then(x => {
+			test.equals(x, 5);
+			p2.catch(e => {
+				test.equals(e, 6);
+				test.done();
+			});
+		});
+	},
+	'sleep': test => {
+		AsyncComputation.schedule = oldSchedule;
+
+		const a1 = Async.sleep(100).map(_ => 5);
+
+		a1.fork(x => {
+			test.equals(x, 5);
+			test.done();
+		}, e => e);
+	},
+	'wrapPromise': test => {
+		AsyncComputation.schedule = oldSchedule;
+
+		const f = x => Promise.resolve(x);
+		const f2 = x => Promise.reject(x);
+
+		const af = Async.wrapPromise(f);
+		const af2 = Async.wrapPromise(f2);
+
+		const a1 = af(5);
+		const a2 = af2(6);
+
+		a1.fork(x => {
+			test.equals(x, 5);
+			a2.fork(x => x, x => {
+				test.equals(x, 6);
+				test.done();
+			});
+		}, x => x);
+	},
 };
+
+//WebWorker mock
+class Worker {
+	constructor(fn) {
+		this._worker = new fn();
+		this._worker.postMessage = x => this.onmessage({data: x});
+	}
+
+	postMessage(x) {
+		return this._worker.onmessage({data: x});
+	}
+
+	terminate() {
+
+	}
+}

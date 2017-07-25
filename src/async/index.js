@@ -51,8 +51,8 @@ class Async {
 		return function(...args) {
 			return Async.create((succ, fail) => {
 				const allArgs = args.concat([(err, val) => {
-					if (err) fail(err);
-					else succ(val);
+					if (err) return fail(err);
+					else return succ(val);
 				}]);
 
 				return fn(...allArgs);
@@ -273,7 +273,7 @@ class Async {
 		return fn => (...args) => {
 			const worker = new Worker(function() {
 				this.sendResult = function(result) {
-					this.postMessage({
+					return this.postMessage({
 						type: 'result',
 						result
 					});
@@ -282,9 +282,9 @@ class Async {
 				this.sendError = function(error) {
 					const cons = error.constructor.name;
 					const name = cons !== 'Object' ? cons : 'CurryingError';
-					const message = error.message || '';
+					const message = error.message;
 
-					this.postMessage({
+					return this.postMessage({
 						type: 'error',
 						name,
 						message,
@@ -292,22 +292,22 @@ class Async {
 				}
 
 				this.onmessage = function(event) {
-					const fn = eval('x => ' + event.data.function)();
+					const fn = eval('____ => ' + event.data.function)();
 					const args = event.data.args;
 
 					try {
 						const res = fn(...args);
 						if (typeof res === 'function') {
-							this.sendError({
+							return this.sendError({
 								message: "Don't use curried functions with Async.parallel",
 							});
 						}
 						else {
-							this.sendResult(res);
+							return this.sendResult(res);
 						}
 					}
 					catch (e) {
-						this.sendError(e);
+						return this.sendError(e);
 					}
 				}
 			});
@@ -321,16 +321,16 @@ class Async {
 						const name = event.data.name;
 
 						if (name === 'CurryingError')
-							fail(new CurryingError(message));
+							return fail(new CurryingError(message));
 						else
-							fail(global[name](message));
+							return fail(global[name](message));
 					}
-					else if (event.data.type === 'result') {
-						succ(event.data.result);
+					else {
+						return succ(event.data.result);
 					}
 				}
 
-				worker.postMessage({
+				return worker.postMessage({
 					function: '' + fn,
 					args,
 				});
