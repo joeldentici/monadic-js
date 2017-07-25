@@ -1,4 +1,6 @@
 # monadic-js #
+[![Build Status](https://travis-ci.org/joeldentici/monadic-js.svg?branch=master)](https://travis-ci.org/joeldentici/monadic-js)
+
 This libary provides implementations of some common monads. These include
 
   * Async
