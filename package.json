@@ -10,12 +10,14 @@
   ],
   "main": "src/monadic.js",
   "scripts": {
-    "document": "hmdoc 'Monadic JS' src markdown > documentation/api.md"
+    "document": "hmdoc 'Monadic JS' src markdown > documentation/api.md",
+    "test": "nodeunit test"
   },
   "dependencies": {
     "immutable": "^3.8.1"
   },
   "devDependencies": {
-    "fantasy-check": "^0.3.2"
+    "fantasy-check": "^0.3.2",
+    "nodeunit": "^0.11.1"
   }
 }
