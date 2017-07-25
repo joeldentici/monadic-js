@@ -177,4 +177,77 @@ exports.Async = {
 		},
 		[Number]
 	),
+	'throw absorption': λ.check(
+		a => {
+			const expected = runAsync(Async.fail("hey"));
+			const result = runAsync(Async.of(a).bind(_ => {
+				throw "hey";
+			}));
+
+			const result2 = runAsync(Async.create((succ, fail) => {
+				throw "hey";
+			}));
+
+			const result3 = runAsync(Async.of(a).map(_ => {
+				throw "hey";
+			}));
+
+			return equals(result, expected) && equals(result2, expected) && equals(result3, expected);
+		},
+		[Number]
+	),
+	'calling succ/fail multiple times': λ.check(
+		a => {
+			const expected = runAsync(Async.fail('eee'));
+			const vals = [];
+			const result = Async.create((succ, fail) => {
+				const x = fail('eee');
+				succ(a);
+				succ(a);
+				return x;
+			}).fork(v => {
+				vals.push(v);
+				return v;
+			}, e => {
+				vals.push(e);
+				return e;
+			});
+
+			const expected2 = runAsync(Async.of(a));
+			const vals2 = [];
+			const result2 = Async.create((succ, fail) => {
+				const x = succ(a);
+				fail('eee');
+				succ(a);
+				return x;
+			}).fork(v => {
+				vals2.push(v);
+				return v;
+			}, e => {
+				vals2.push(e);
+				return e;
+			});
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& vals.length === 1 && vals2.length === 1;
+		},
+		[Number]
+	),
+	'case/run': λ.check(
+		a => {
+			const fn = (succ, fail) => {
+				return succ(a);
+			};
+
+			const expected = fn(identity, identity);
+			const result = Async.create(fn).doCase(f => f(identity, identity));
+			const result2 = Async.create(fn).run();
+
+			const result3 = Async.first(Async.create(fn), Async.of(5)).run();
+
+			return equals(result, expected) && equals(result2, expected)
+				&& equals(result3[0], expected) && equals(result3[1], undefined);
+		},
+		[Number]
+	),
 };

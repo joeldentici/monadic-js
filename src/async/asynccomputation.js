@@ -25,7 +25,7 @@ class AsyncComputation extends CaseClass {
 				return thunk(succ, fail);
 			}
 			catch (e) {
-				fail(e);
+				return fail(e);
 			}
 		};
 	}
@@ -68,7 +68,7 @@ class AsyncComputation extends CaseClass {
 	 *	and wanted to catch them using chainFail/catch.
 	 */
 	run() {
-		return this.fork(x => undefined, e => undefined);
+		return this.fork(x => x, e => e);
 	}
 
 	/**

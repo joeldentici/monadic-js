@@ -30,15 +30,19 @@ class AsyncFirst extends AsyncComputation {
 	fork(s, f) {
 		let done = false;
 		const succ = x => {
+			let v;
 			if (!done)
-				s(x);
+				v = s(x);
 			done = true;
+			return v;
 		}
 
 		const fail = x => {
+			let v;
 			if (!done)
-				f(x);
+				v = f(x);
 			done = true;
+			return v;
 		}
 
 		return this.comps.map(comp => comp.fork(succ, fail));

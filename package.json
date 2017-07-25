@@ -11,13 +11,18 @@
   "main": "src/monadic.js",
   "scripts": {
     "document": "hmdoc 'Monadic JS' src markdown > documentation/api.md",
-    "test": "nodeunit test"
+    "test": "nodeunit test",
+    "coveragelcov": "nyc --reporter=lcov npm test",
+    "coverage": "nyc npm test",
+    "coveralls": "npm run coveragelcov && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "dependencies": {
     "immutable": "^3.8.1"
   },
   "devDependencies": {
+    "coveralls": "^2.13.1",
     "fantasy-check": "^0.3.2",
-    "nodeunit": "^0.11.1"
+    "nodeunit": "^0.11.1",
+    "nyc": "^11.0.3"
   }
 }
