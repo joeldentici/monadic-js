@@ -67,6 +67,13 @@ class Just extends CaseClass {
 	}
 
 	/**
+	 *	alt :: Just a -> Maybe b -> Just a
+	 */
+	alt(o) {
+		return this;
+	}
+
+	/**
 	 *	doCase :: Just a -> (a -> b) -> b
 	 *
 	 *	Apply the function to the value contained

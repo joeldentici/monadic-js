@@ -210,7 +210,7 @@ const seqAll = exports.seqAll = function(type, xs) {
  *	Repeats the specified action cnt times and collects
  *	the results into a list.
  */
-const replicateM = exports.replicateM = function(type, cnt = 0, a) {
+const replicateM = exports.replicateM = function(type, cnt, a) {
 	const add = x => xs => {
 		xs.push(x);
 		return xs;

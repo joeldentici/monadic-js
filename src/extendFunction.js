@@ -80,7 +80,7 @@ function addExtensions() {
 	});
 
 	Object.keys(newConstructor).forEach(k => {
-		newConstructor[k] = Function[k];
+		oldConstructor[k] = Function[k];
 		Function[k] = newConstructor[k];
 	});
 }

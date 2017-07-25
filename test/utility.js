@@ -7,7 +7,11 @@ const {identity, constant} = require('fantasy-combinators');
 const Maybe = require('../src/maybe');
 const Utility = require('../src/utility.js');
 require('../src/extendArray.js').addExtensions();
-require('../src/extendFunction.js').addExtensions();
+const funcExt = require('../src/extendFunction.js');
+funcExt.addExtensions();
+funcExt.removeExtensions();
+funcExt.useExtensions(x => x);
+funcExt.addExtensions();
 
 const {equals} = require('../test-lib.js');
 
@@ -186,5 +190,162 @@ exports.Utility = {
 			 && equals(result5, expected5) && equals(result6, expected6);
 		},
 		[Number, Number, Number, Number]
-	)
+	),
+	'const': λ.check(
+		(a, b) => {
+			return equals(Utility.constant(a)(b), a) && equals(Function.of(a)(b), a);
+		},
+		[Number, Number]
+	),
+	'folds': λ.check(
+		a => {
+			const expected = Maybe.of([a, a + 1, a + 2]);
+
+			const append = (l,v) => Maybe.of(l.concat(v));
+			const append2 = (v,l) => append(l,v);
+
+			const result = Utility.foldlM(Maybe, append)([])([a, a + 1, a + 2]);
+			const result2 = Utility.foldrM(Maybe, append2)([])([a, a + 1, a + 2]);
+
+
+			return equals(result, expected) && equals(result2, expected);
+		},
+		[Number]
+	),
+	'doM': λ.check(
+		(a,b,c) => {
+			const expected = Maybe.of(a + b + c);
+
+			const result = Utility.doM(function*() {
+				const x = yield Maybe.of(a);
+				const y = yield Maybe.of(b);
+				const z = yield Maybe.of(c);
+
+				return Maybe.of(x + y + z);
+			})
+
+			return equals(result, expected);
+		},
+		[Number, Number, Number]
+	),
+	'kleisi': λ.check(
+		a => {
+			const expected = Maybe.of(a / 2 + 1);
+			const half = x => Maybe.of(x / 2);
+			const plus = x => Maybe.of(x + 1);
+
+			const fn = half.arrow(plus);
+
+			const result = Maybe.of(a).chain(fn);
+
+			return equals(result, expected);
+		},
+		[Number]
+	),
+	'seq: (-> r).map': λ.check(
+		a => {
+			const half = x => x / 2;
+			const plus = x => x + 1;
+
+			const fn = half.map(plus);
+
+			return equals(fn(a), a / 2 + 1);
+		},
+		[Number]
+	),
+	'chain: (-> r).chain': λ.check(
+		a => {
+			const half = x => x / 2;
+			const plus = x => x + 1;
+
+			const orig = x => x * 5;
+
+			const chained = x => x > 1 ? half : plus;
+
+			const fn = orig.chain(chained);
+
+			return equals(fn(a), a * 5 > 1 ? half(a) : plus(a));
+		},
+		[Number]
+	),
+	'alt': λ.check(
+		a => {
+			const f1 = x => Maybe.of(x);
+			const f2 = x => Maybe.Nothing;
+
+			const f3 = f1.alt(f2);
+			const f4 = f2.alt(f2);
+
+			return equals(f3(a), Maybe.of(a)) && equals(f4(a), Maybe.Nothing);
+		},
+		[Number]
+	),
+	'[].chain': λ.check(
+		() => {
+			const xs = [1,2,3];
+			const f = x => [x + 1, x + 2];
+			const expected = [2,3,3,4,4,5];
+
+			const result = xs.chain(f);
+
+			return equals(result, expected);
+		},
+		[]
+	),
+	'[].app': λ.check(
+		() => {
+			const xs = [1,2,3];
+			const f = [x => x + 1, x => x * 2]
+			const expected = [2,3,4,2,4,6];
+
+			const result = f.app(xs);
+			const result2 = xs.ap(f);
+
+			return equals(result, expected) && equals(result2, expected);
+		},
+		[]
+	),
+	'[].seqL/R': λ.check(
+		() => {
+			const xs = [1,2,3];
+			const ys = [3,4,5];
+			const expected = [1,1,1,2,2,2,3,3,3];
+			const expected2 = [3,4,5,3,4,5,3,4,5];
+
+			const result = xs.seqL(ys);
+			const result2 = xs.seqR(ys);
+
+			return equals(result, expected) && equals(result2, expected2);
+		},
+		[]
+	),
+	'[].alt': λ.check(
+		() => {
+			const xs = [1,2,3];
+			const ys = [3,4,5];
+			const expected = [1,2,3,3,4,5];
+
+			const result = xs.alt(ys);
+
+			return equals(result, expected);
+		},
+		[]
+	),
+	'Array.of/zero/append': λ.check(
+		() => {
+			const result = Array.of(1);
+			const expected = [1];
+
+			const result2 = Array.zero();
+			const expected2 = [];
+
+			const result3 = Array.append(1, [1,2]);
+			const expected3 = [1,2,1];
+
+			return equals(result, expected) && equals(result2, expected2)
+				&& equals(result3, expected3);
+		},
+		[]
+	),
+
 };

@@ -59,6 +59,13 @@ class Nothing extends CaseClass {
 	}
 
 	/**
+	 *	alt :: Nothing -> Maybe a -> Maybe a
+	 */
+	alt(o) {
+		return o;
+	}
+
+	/**
 	 *	doCase :: Nothing -> (() -> b) -> b
 	 *
 	 *	Applies the function
