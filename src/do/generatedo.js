@@ -51,8 +51,7 @@ function generateDoStatement(statement, next) {
 }
 
 function generateIf(cond, tBranch, fBranch) {
-	return `( (${generate(cond)}) ? 
-	(${generate(tBranch)}) : (${generate(fBranch)}) )`;
+	return `( (${generate(cond)}) ? (${generate(tBranch)}) : (${generate(fBranch)}) )`;
 }
 
 function generateVar(lvalue, expr) {
