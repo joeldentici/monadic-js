@@ -26,7 +26,11 @@ This libary provides implementations of some common monads. These include
     * The normal old State monad
     
 ## Installation
-Currently not on NPM. There are still a couple of things that need to be done before it is ready for release.
+Run
+
+`npm install --save monadic-js`
+
+in your project directory
 
 ## Array and Function Extensions
 Array and its prototype are extended so it fulfills the fantasy-land Monad, Functor, Appplicative, and Alternative
@@ -237,7 +241,6 @@ Applicative Do
   
 Proper fantasy-land methods
   * Right now the fantasy-land methods are not 'namespaced' properly.
-  * This will be done before release on NPM
   
 ## More Info
 Read the full API documentation [here](documentation/api.md).
