@@ -7,8 +7,7 @@ const {identity, constant} = require('fantasy-combinators');
 const Async = require('../src/async');
 const AsyncComputation = require('../src/async/asynccomputation.js');
 //for testing, we will schedule computations to actually run immediately!
-const oldSchedule = AsyncComputation.schedule;
-AsyncComputation.schedule = x => x();
+const oldSchedule = Async.setScheduler(x => x());
 
 /* This old version of fantasy-check's laws are using an outdated spec for Applicative,
  even though it is technically the right way. So we need to make ap = app */

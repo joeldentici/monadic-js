@@ -337,6 +337,29 @@ class Async {
 			});
 		}
 	}
+
+	/** 
+	 *	Scheduler a b c :: (a -> b) -> c
+	 *
+	 *	A function that can be applied to a thunk to
+	 *	possibly schedule the thunk to run at a later time.
+	 *
+	 *	Different schedulers return different results. The immediate
+	 *	scheduler <code>x => x()</code> returns the result of the thunk (b = c).
+	 */
+
+	/**
+	 *	setScheduler :: Scheduler a b c -> Scheduler a b d
+	 *
+	 *	Sets a new scheduler to use for all Async computations. Returns
+	 *	the old scheduler.
+	 */
+	static setScheduler(scheduler) {
+		const old = AsyncComputation.schedule;
+		AsyncComputation.schedule = scheduler;
+
+		return old;
+	}
 }
 
 class NonExistenceError extends Error {
