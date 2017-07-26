@@ -170,7 +170,7 @@ const arrowFunction = P.recursive(() =>
 	P.of(ArrowExpression)
 	 .app(arrowSignature)
 	 .skip(arrow)
-	 .app(expr) //TODO: this should be do expression
+	 .app(expr)
 	 .memoize(true, 5)
 );
 
