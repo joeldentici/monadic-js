@@ -8,6 +8,12 @@
       "email": "joeldentici@cox.net"
     }
   ],
+  "homepage": "https://github.com/joeldentici/monadic-js",
+  "bugs": "https://github.com/joeldentici/monadic-js/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joeldentici/monadic-js.git"
+  },
   "main": "src/monadic.js",
   "scripts": {
     "document": "hmdoc 'Monadic JS' src markdown > documentation/api.md",
