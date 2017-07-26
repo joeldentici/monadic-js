@@ -1,7 +1,7 @@
 {
   "name": "monadic-js",
   "version": "1.0.2",
-  "description": "Basic monads and do-notation generator.",
+  "description": "Algebraic structure implementations, do-notation, and operators to truly live the fantasy",
   "contributors": [
     {
       "name": "Joel Dentici",
