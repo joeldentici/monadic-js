@@ -1,5 +1,6 @@
 'use strict';
 const CaseClass = require('../utility.js').CaseClass;
+const Rx = require('rx');
 
 /**
  *	MonadicJS.Async.AsyncComputation
@@ -79,6 +80,36 @@ class AsyncComputation extends CaseClass {
 	 */
 	toPromise() {
 		return new Promise((s, f) => this.fork(s, f));
+	}
+
+	/**
+	 *	toObservable :: Async c e a -> Observable e a
+	 *
+	 *	Creates an Observable that will run this computation
+	 *	for every observer to produce a single value for that
+	 *	observer and complete, or will end with an error if
+	 *	the computation fails.
+	 *
+	 *	This can be useful for running actions in response to
+	 *	each event emitted by an Observable by chaining/binding
+	 *	a function to it that returns Observables created by calling
+	 *	this method on an Async.
+	 *
+	 *	Note that this does not break the laziness of an Async computation
+	 *	as Observables are also lazy.
+	 *
+	 *	Remember to call .share as appropriate if you only want the
+	 *	Async computation to run once for all observers.
+	 */
+	toObservable() {
+		return Rx.Observable.create((observer) => {
+			this.fork(x => {
+				observer.onNext(x);
+				observer.onCompleted();
+			}, e => {
+				observer.onError(e);
+			});
+		});
 	}
 
 	/**

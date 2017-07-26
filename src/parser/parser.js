@@ -383,12 +383,43 @@ class Parser_ {
 		if (typeof even !== 'boolean')
 			even = true;
 
+		/* Not using anymore */
 		//check based on parity of remaining input
 		//and parity of parser whether we should
 		//reuse an earlier result in a left-recursion
 		//chain.
-		const useresult = t =>
-			(t % 2 === 0 ? !even : even);
+		/*const useresult = t => {
+			const evenInput = t % 2 === 0;
+			const evenParser = even;
+			function f() {
+				if (evenInput && evenParser)
+					return false;
+				else if (evenInput && !evenParser)
+					return true;
+				else if (!evenInput && evenParser)
+					return true;
+				else if (!evenInput && !evenParser)
+					return false;				
+			}
+
+			console.log(f());
+			return f();
+
+
+			//(t % 2 === 0 ? !even : even);
+		}*/
+
+		/* If the parser expects an even amount of input,
+		   then we apply it remainingLength + 1 times before
+		   curtailment. If it expects an odd amount of input,
+		   then we apply it remainingLength times before curtailment.
+		*/
+		const getMaxDepth = t => {
+			if (even)
+				return t + 1;
+			else
+				return t;
+		}
 
 		return Parser(t => p => lrec =>
 			doM(function*() {
@@ -400,7 +431,7 @@ class Parser_ {
 				}
 				else {
 					const depth = lrec.getIn([name], 0);
-					if (depth > t.length - p + 1) {
+					if (depth > getMaxDepth(t.length - p)) {
 						res = Fail(p)(new Error('Curtailment'))(ImmutableSet([name]));
 
 						return State.unit(res);
@@ -410,6 +441,7 @@ class Parser_ {
 					const newLrec = lrec.setIn([name], depth + 1);
 					res = yield self.runParser(t)(p)(newLrec);
 
+					/* Not using anymore */
 					//check for a better result in the state.
 					//this will happen when we have indirect
 					//left recursion. this was not needed in
@@ -421,7 +453,7 @@ class Parser_ {
 					//for a better result to use.
 					//
 					//there are probably better ways to do this.
-					mt = yield State.get;
+					/*mt = yield State.get;
 					let res2 = lookup(name, p, lrec, mt);
 					if (useresult(t.length - p) && res2) {
 						res = res.case({
@@ -431,7 +463,7 @@ class Parser_ {
 								Left: _ => res,
 							})
 						});
-					}
+					}*/
 
 					const p_ctx = pruneContext(res.case({
 						Left: ({used}) => used,
@@ -482,6 +514,16 @@ const Parser = module.exports = p => new Parser_(p);
 Parser.of = Parser.unit = x => Parser(_ => p => _ => State.unit(Succeed(p)(x)(ImmutableSet())));
 
 /**
+ *	fail :: Error -> Parser t ()
+ *
+ *	Returns a parser that always fails with
+ *	the provided error.
+ */
+Parser.fail = error => Parser(t => p => lrec =>
+	State.unit(Fail(p)(error)(ImmutableSet()))
+);
+
+/**
  *	empty :: Parser t ()
  *
  *	A parser with no result. This parser always succeeds
@@ -492,11 +534,20 @@ Parser.empty = Parser.of();
 /**
  *	zero :: () -> Parser t ()
  *
- *	Constant function returning the empty parser.
+ *	Constant function returning a failing parser.
+ *
+ *	This is the zero of the MonadPlus monoid, satisfying
+ *	annihilation: zero() >>= f = zero(), zero().app(x) = zero()
+ *
+ *	You can use empty as a zero for the Alternative/MonadPlus that does
+ *	not interfere with sequencing (whether applicative or monadic),
+ *	but the normal laws do not hold. Empty is more useful for parsers than
+ *	zero is, since it is normally the case that we want a branch that
+ *	succeeds without consuming input, not one that fails without consuming input.
  *
  *	Exists for fantasy-land compatability.
  */
-Parser.zero = () => Parser.empty;
+Parser.zero = () => Parser.fail();
 
 /* Useful helpers */
 
@@ -705,7 +756,7 @@ Parser.regex = Parser.regexTerm = x => name => Parser(t => p => lrec => {
 	const matches = (t.substring(p) || "").match(x);
 
 	if (matches) {
-		return State.unit(Succeed(p + matches[0].length)(matches)(ImmutableSet()));
+		return State.unit(Succeed(p + matches.index + matches[0].length)(matches)(ImmutableSet()));
 	}
 	else {
 		return State.unit(Fail(p)(new ExpectedError(name))(ImmutableSet()));
@@ -785,13 +836,14 @@ Parser.findToken = predicate => name => Parser(t => p => lrec => {
  *
  *	If it does, true is returned, otherwise false
  *	is returned. The resulting parser does not
- *	consume input.
+ *	consume input and never fails (in the sense of throwing
+ *	an error).
  */
 Parser.lookahead = parser => Parser(t => p => lrec => 
 	parser.runParser(t)(p)(lrec)
 		.map(r => r.case({
 			Right: _ => Succeed(p)(true)(ImmutableSet()),
-			Left: _ => Fail(p)(false)(ImmutableSet()),
+			Left: _ => Succeed(p)(false)(ImmutableSet()),
 		}))
 );
 
@@ -837,16 +889,6 @@ Parser.eof = Parser(t => p => lrec => {
 	else
 		return State.unit(Fail(p)(new ExpectedError("EOF"))(ImmutableSet()));
 });
-
-/**
- *	fail :: Error -> Parser t ()
- *
- *	Returns a parser that always fails with
- *	the provided error.
- */
-Parser.fail = error => Parser(t => p => lrec =>
-	State.unit(Fail(p)(error)(ImmutableSet()))
-);
 
 /**
  *	showError :: ParseError -> ([t], int) -> string

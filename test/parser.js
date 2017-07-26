@@ -1,4 +1,176 @@
+const λ = require('fantasy-check/src/adapters/nodeunit');
 
+const {equals} = require('../test-lib.js');
+const {identity, constant} = require('fantasy-combinators');
+
+const P = require('../src/parser');
+const Either = require('../src/either');
+
+function eq(test) {
+	return function(a, b) {
+		test.equals(equals(a, b), true);
+	}
+}
+
+function result(parse) {
+	return x => parse(x).case({
+		Right: ({val}) => Either.of(val),
+		Left: ({err}) => Either.Left(err)
+	});
+}
+
+exports.Parser = {
+	'left-recursion': test => {
+		const res = x => y => [x, y];
+		const res2 = x => y => z => [x,y,z];
+
+		const parser = P.recursive(() =>
+		  P.of(res).app(parser).app(parser)
+		   .alt(a)
+		).memoize();
+
+		const parser2 = P.recursive(() =>
+		  P.of(res2).app(parser2).app(parser2).app(parser2)
+		   .alt(a)
+		).memoize(false);
+
+		const a = P.term('a');
+
+		const parse = result(P.runParser(parser));
+		const parse2 = result(P.runParser(parser2));
+
+		const _ = eq(test);
+
+		_(parse('aa'), Either.of(['a','a']));
+		_(parse2('aaa'), Either.of(['a','a','a']));
+
+		test.done();
+	},
+	'chain-failing': test => {
+		const parser = P.of('a').chain(_ => P.fail('e'));
+
+		const parse = result(P.runParser(parser));
+
+		const _ = eq(test);
+
+		_(parse('a'), Either.Left('e'));
+
+		test.done();
+	},
+	'fallback-test': test => {
+		const parser = P.fail('e').fallback('a');
+		const parser2 = P.of('b').fallback('a');
+
+		const parse = result(P.runParser(parser));
+		const parse2 = result(P.runParser(parser2));
+
+		const _ = eq(test);
+
+		_(parse(''), Either.of('a'));
+		_(parse2(''), Either.of('b'));
+
+		test.done();
+	},
+	'alternative/monadplus annihilation': test => {
+		const parser = P.zero().chain(_ => P.of('a'));
+		const parse = result(P.runParser(parser));
+		const zero = result(P.runParser(P.zero()));
+
+		const _ = eq(test);
+
+		_(parse(''), zero(''));
+
+		test.done();
+	},
+	'all': test => {
+		const parser = P.all;
+		const parse = result(P.runParser(parser));
+
+		const _ = eq(test);
+
+		_(parse('abcde'), Either.of('abcde'));
+
+		test.done();
+	},
+	'any': test => {
+		const parser = P.any;
+		const parse = result(P.runParser(parser));
+
+		const _ = eq(test);
+
+		_(parse('a'), Either.of('a'));
+		_(parse('b'), Either.of('b'));
+		_(parse(''), Either.Left(new P.ExpectedError('any input')));
+
+		test.done();
+	},
+	'lookahead': test => {
+		const p = P.term('a');
+		const parser = P.lookahead(p);
+
+		const parse = result(P.runParser(parser, false));
+
+		const _ = eq(test);
+
+		_(parse('a'), Either.of(true));
+		_(parse('b'), Either.of(false));
+
+		test.done();
+	},
+	'regex': test => {
+		const p = P.regex(/a/)('an a');
+		const parse = result(P.runParser(p, false));
+
+		const _ = eq(test);
+
+		_(parse('bbbakkk'), Either.of('bbbakkk'.match(/a/)));
+		_(parse('bbbbb'), Either.Left(new P.ExpectedError('an a')));
+
+		test.done();
+	},
+	'eof': test => {
+		const p = P.eof;
+		const parse = result(P.runParser(p));
+
+		const _ = eq(test);
+
+		_(parse('a'), Either.Left(new P.ExpectedError('EOF')));
+
+		test.done();
+	},
+	'findToken': test => {
+		const parser = P.findToken(t => t === 'a')('an a');
+		const parse = result(P.runParser(parser));
+
+		const _ = eq(test);
+
+		_(parse(['b','b','b','a']), Either.of('a'));
+		_(parse(['b','b','b','b']), Either.Left(new P.ExpectedError('an a')));
+
+		test.done();
+	},
+	'show': test => {
+		//TODO: Replace this with an actual test once i've bothered to make
+		//show actually useful
+
+		P.showError({
+			err: new P.ExpectedError('an a'),
+			pos: 0
+		})([]);
+
+		P.showError({
+			err: new P.ExpectedError([new P.ExpectedError('an a'), new P.ExpectedError('a b')]),
+			pos: 0,
+		})([]);
+
+		P.showError({
+			err: new Error("a"),
+			pos: 0,
+		})([]);
+
+		test.done();
+	}
+};
 /*
 const P = require('./index.js');
 

@@ -18,7 +18,8 @@
     "test": "npm run coveralls"
   },
   "dependencies": {
-    "immutable": "^3.8.1"
+    "immutable": "^3.8.1",
+    "rx": "^4.1.0"
   },
   "devDependencies": {
     "coveralls": "^2.13.1",

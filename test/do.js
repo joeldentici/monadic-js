@@ -64,6 +64,7 @@ exports.Do = {
 		const input15 = 'expr { a <*> b }';
 		const input16 = 'expr { a *> b }';
 		const input17 = 'expr { a <* b }';
+		const input18 = 'expr { a(b(), c()) }';
 
 		const _ = eq(test);
 
@@ -84,6 +85,7 @@ exports.Do = {
 		_(transformJS(input15), Either.of('a.app(b)'));
 		_(transformJS(input16), Either.of('a.seqR(b)'));
 		_(transformJS(input17), Either.of('a.seqL(b)'));
+		_(transformJS(input18), Either.of('( a )(( b )(), ( c )())'));
 
 		test.done();
 	},

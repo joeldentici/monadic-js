@@ -381,6 +381,27 @@ exports.Async = {
 			});
 		});
 	},
+	'toObservable': test => {
+		AsyncComputation.schedule = oldSchedule;
+
+		const o1 = Async.of(5).toObservable();
+		const o2 = Async.fail(6).toObservable();
+
+		o1.subscribe({
+			onNext: x => test.equals(x, 5),
+			onError: e => test.equals(0, 1),
+			onCompleted: () => {
+				o2.subscribe({
+					onNext: x => test.equals(0, 1),
+					onError: e => {
+						test.equals(e, 6)
+						test.done();
+					},
+					onCompleted: () => test.equals(0, 1),
+				});
+			}
+		});
+	},
 	'sleep': test => {
 		AsyncComputation.schedule = oldSchedule;
 
