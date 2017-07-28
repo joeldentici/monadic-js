@@ -49,6 +49,12 @@ class FromAsync extends CaseClass {
 	}
 }
 
+class Delay extends CaseClass {
+	doCase(fn) {
+		return fn();
+	}
+}
+
 /**
  *	catch e a :: Object
  *
@@ -97,6 +103,22 @@ const throwE = err => F.liftF(new ThrowE(err));
 const fromAsync = async => F.liftF(new FromAsync(async));
 
 /**
+ *	delay :: Free Control ()
+ *
+ *	Represents a delay in further computation.
+ *
+ *	This can be useful at the beginning of a Free program
+ *	to force waiting before executing the first statement,
+ *	which might be a plain old JS statement with a side effect
+ *	that we did not intend to run yet. It is unimportant for
+ *	"pure" side effects that occur in a monad.
+ *
+ *	We can't get this from just using F.of since we immediately
+ *	apply the chained function.
+ */
+const delay = F.liftF(new Delay());
+
+/**
  *	fromPromise :: Promise e a -> Free Control a
  *
  *	Wraps the promise in an Async and then applies
@@ -123,6 +145,7 @@ class Interpreter {
 			},
 			ThrowE: err => Async.fail(err),
 			FromAsync: async => async,
+			Delay: _ => Async.of(),
 			default: () => {},
 		});
 	}
@@ -143,5 +166,6 @@ module.exports = {
 	tryF,
 	throwE,
 	fromAsync,
-	fromPromise
+	fromPromise,
+	delay
 };
