@@ -352,7 +352,7 @@ const zip = exports.zip = function(a, b) {
  *	Skip :: Object
  *
  *	A special type of object that can
- *	be used to fail a computation, therefore
+ *	be used to fail an action, therefore
  *	skipping the rest of it, with the intention
  *	that the caller will handle this failure.
  */
@@ -374,12 +374,12 @@ const skip = exports.skip = new Skip();
 /**
  *	resume :: MonadFail m => m a -> m a
  *
- *	Stops the "skipping" of a computation by
+ *	Stops the "skipping" of a action by
  *	handling the error that skipping introduced.
  *
- *	If the computation was not skipped, this has
+ *	If the action was not skipped, this has
  *	no effect (just like normal catching), and if
- *	the computation had any error other than the skipping
+ *	the action had any error other than the skipping
  *	one, then it will be propagated.
  */
 const resume = exports.resume = function(v) {
@@ -408,9 +408,26 @@ const liftMaybe = exports.liftMaybe = function(m, f) {
 /**
  *	exists :: MonadFail m => m (Maybe a) -> m a
  *
- *	Flattens a monadic computation that contains a Maybe using
+ *	Flattens a monadic action that contains a Maybe using
  *	the monad's fail method with a Skip error.
  */
 const exists = exports.exists = function(v) {
 	return v.chain(x => liftMaybe(v.constructor, id)(x));
+}
+
+/**
+ *	retry :: MonadFail m => int -> (...any -> m a) -> ...any -> m a
+ *
+ *	Wraps a monadic computation/function so that if it fails, it
+ *	is automatically retried a specified number of times.
+ */
+const retry = exports.retry = times => comp => (...args) => {
+	const v = comp(...args);
+
+	return v.chainFail(e => {
+		if (times > 1)
+			return retry(times - 1)(comp)(...args);
+		else
+			return v.constructor.fail(e);
+	});
 }

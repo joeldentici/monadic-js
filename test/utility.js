@@ -389,6 +389,37 @@ exports.Utility = {
 			test.ok(false, e);
 			test.done();
 		});
+	},
+	'retry': test => {
+		const f = a => Async.fail(a);
+		const fA = Utility.retry(5)(f);
+
+		fA(6).fork(x => {
+			test.ok(false, 'should have failed');
+			test.done();
+		}, e => {
+			test.equals(e, 6);
+			test.done();
+		});
+	},
+	'retry succeeded': test => {
+		let v = 2;
+		const f = a => {
+			if (v--)
+				return Async.of(a);
+			else
+				return Async.fail(a + 1);
+		};
+
+		const fA = Utility.retry(5)(f);
+
+		fA(6).fork(x => {
+			test.equals(x, 6);
+			test.done();
+		}, e => {
+			test.ok(false, 'should have worked');
+			test.done();
+		});
 	}
 
 };
