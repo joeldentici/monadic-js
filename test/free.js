@@ -8,7 +8,7 @@ const F = require('../src/monadic.js').ConcurrentFree;
 const {interpreter: controlInterpreter, tryF, throwE, fromAsync} = F.Control;
 const Async = require('../src/async');
 const AsyncComputation = require('../src/async/asynccomputation.js');
-const CaseClass = require('../src/utility.js').CaseClass;
+const {CaseClass, skip, resume} = require('../src/utility.js');
 //for testing, we will schedule computations to actually run immediately!
 AsyncComputation.schedule = x => x();
 
@@ -210,5 +210,60 @@ exports.ConcurrentFree = {
 		},
 		[Number]
 	),
+	'fail/catch/mapFail': λ.check(
+		a => {
+			const msgs = [];
+			const run = getRun(msgs);
+
+			//const prog = F.of(a).ap(F.of(x => x + 1));
+			const prog = F.of(0).chain(_ => F.fail(a)).chainFail(e => F.of(e + 1));
+
+			const prog2 = F.fail(a).mapFail(e => e + 1);
+
+			const expected = a + 1;
+			const result = run(prog);
+			const result2 = run(prog2);
+
+			return equals(result, expected) && equals(result, expected);
+		},
+		[Number]
+	),
+	'skipping': λ.check(
+		a => {
+			const msgs = [];
+			const run = getRun(msgs);
+
+			//const prog = F.of(a).ap(F.of(x => x + 1));
+			const prog = F.of(a)
+				.chain(_ => F.fail(skip))
+				.chain(x => x * 5);
+
+			const prog2 = F.Control.delay
+				.chain(_ => F.fail(new Error('err')));
+
+			const resumed = resume(prog).map(_ => a + 1);
+			const resumed2 = resume(prog2).map(_ => a + 1);
+
+			const expected = a + 1;
+			const result = run(resumed);
+
+			const expected2 = 'err';
+			const result2 = run(resumed2).message;
+
+			return equals(result, expected) && equals(result2, expected2);
+		},
+		[Number]
+	),
+	'fromPromise': test => {
+		const prog = F.Control.fromPromise(Promise.resolve(5)).map(x => x + 1);
+
+		const interpret = F.interpret(Async, F.Control.interpreter);
+
+		interpret(prog).fork(x => {
+			test.equals(x, 6);
+			test.done();
+		}, e => e);
+	}
+
 
 };

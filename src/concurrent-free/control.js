@@ -80,6 +80,10 @@ class Delay extends CaseClass {
  *	type of the Free Monad returned by the handler.
  *
  *	Returning a catch is purely so that this looks like normal JS.
+ *
+ *	This is unnecessary to use directly as the `chainFail, chainMap, catch`
+ *	methods on `ConcurrentFree` all use it. It might still be useful if you
+ *	prefer the standard try-catch look.
  */
 const tryF = op => ({
 	catch: handler => F.liftF(new Try(op, handler))

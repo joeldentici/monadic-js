@@ -347,3 +347,46 @@ const zip = exports.zip = function(a, b) {
 	}
 	return zipAcc(a, b, []);	
 }
+
+/**
+ *	Skip :: Object
+ *
+ *	A special type of object that can
+ *	be used to fail a computation, therefore
+ *	skipping the rest of it, with the intention
+ *	that the caller will handle this failure.
+ */
+class Skip {
+
+}
+
+/**
+ *	skip :: Skip
+ *
+ *	A value of the type Skip. This can be used
+ *	with `m.fail` for any `MonadFail m`.
+ *
+ *	Another point in the monadic 'program' can
+ *	use `resume(v)` to end the skipping.
+ */
+const skip = exports.skip = new Skip();
+
+/**
+ *	resume :: MonadFail m => m a -> m a
+ *
+ *	Stops the "skipping" of a computation by
+ *	handling the error that skipping introduced.
+ *
+ *	If the computation was not skipped, this has
+ *	no effect (just like normal catching), and if
+ *	the computation had any error other than the skipping
+ *	one, then it will be propagated.
+ */
+const resume = exports.resume = function(v) {
+	return v.chainFail(e => {
+		if (e instanceof Skip)
+			return v.constructor.of();
+		else
+			return v.constructor.fail(e);
+	});
+}

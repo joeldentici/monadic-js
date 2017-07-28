@@ -6,6 +6,7 @@ const monad = require('fantasy-check/src/laws/monad');
 const {identity, constant} = require('fantasy-combinators');
 const Maybe = require('../src/maybe');
 const Utility = require('../src/utility.js');
+const Async = require('../src/async');
 require('../src/extendArray.js').addExtensions();
 const funcExt = require('../src/extendFunction.js');
 funcExt.addExtensions();
@@ -347,5 +348,25 @@ exports.Utility = {
 		},
 		[]
 	),
+	'forever': test => {
+		let times = 0;
+
+		const comp = Async.create((succ, fail) => {
+			if (times < 10) {
+				times++;
+				succ(times);
+			}
+			else
+				fail(times);
+		});
+
+		Utility.forever(comp).fork(x => {
+			test.ok(false, "comp should have failed");
+			test.done();
+		}, e => {
+			test.equals(e, 10, "Should have run 10 times");
+			test.done();
+		});
+	}
 
 };

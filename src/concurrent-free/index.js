@@ -110,7 +110,51 @@ class Free extends CaseClass {
 	 *	list to use this, or you will get an error at runtime.
 	 */
 	alt(o) {
-		return tryF(this).catch(e => o);
+		return this.catch(e => o);
+	}
+
+	/**
+	 *	catch :: Free f a -> (e -> Free f b) -> Free f (a | b)
+	 *
+	 *	If the computation represented by this Free monad fails,
+	 *	then the specified handler will be applied to the error
+	 *	in an attempt to recover. The handler maps an error into
+	 *	a new computation.
+	 *
+	 *	You must include Control.interpreter in your interpreter
+	 *	list to use this, or you will get an error at runtime.
+	 */
+	catch(h) {
+		return tryF(this).catch(h);
+	}
+
+	/**
+	 *	chainFail :: Free f a -> (e -> Free f b) -> Free f (a | b)
+	 *
+	 *	You must include Control.interpreter in your interpreter
+	 *	list to use this, or you will get an error at runtime.
+	 *
+	 *	Alias for catch
+	 */
+	chainFail(h) {
+		return this.catch(h);
+	}
+
+	/**
+	 *	mapFail :: Free f a -> (e -> e2) -> Free f a
+	 *
+	 *	Maps the error in a Free monad computation. This is
+	 *	of course bypassed if the computation does not result
+	 *	in an error.
+	 *
+	 *	This cannot be used to recover from an error, only for mapping
+	 *	them. See chainFail and catch for error recovery.
+	 *
+	 *	You must include Control.interpreter in your interpreter
+	 *	list to use this, or you will get an error at runtime.
+	 */
+	mapFail(f) {
+		return this.catch(e => Free.fail(f(e)));
 	}
 }
 
@@ -305,3 +349,11 @@ Free.empty = throwE();
  *	Returns Free.empty
  */
 Free.zero = () => Free.empty;
+
+/**
+ *	fail :: e -> Free f a
+ *
+ *	Results in a failed computation
+ *	with the specified error.
+ */
+Free.fail = throwE;
