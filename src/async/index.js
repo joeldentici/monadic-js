@@ -1,5 +1,3 @@
-const AsyncComputation = require('./asynccomputation.js');
-const AsyncFirst = require('./asyncfirst.js');
 const {all} = require('../utility.js');
 
 /**
@@ -362,6 +360,11 @@ class Async {
 	}
 }
 
+module.exports = Async;
+
+const AsyncComputation = require('./asynccomputation.js');
+const AsyncFirst = require('./asyncfirst.js');
+
 class NonExistenceError extends Error {
 	constructor(method) {
 		super(method + ': Received Maybe.Nothing');
@@ -373,5 +376,3 @@ class CurryingError extends Error {
 }
 
 
-
-module.exports = Async;

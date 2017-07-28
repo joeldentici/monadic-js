@@ -367,6 +367,28 @@ exports.Utility = {
 			test.equals(e, 10, "Should have run 10 times");
 			test.done();
 		});
+	},
+	'liftMaybe/exists': test => {
+		const f = a => a > 5 ? Maybe.Just(a) : Maybe.Nothing;
+
+		const fA = Utility.liftMaybe(Async, f);
+
+		const a1 = Utility.resume(fA(3));
+		const a2 = Utility.resume(fA(6));
+
+		const a3 = Utility.resume(Utility.exists(Async.of(Maybe.Nothing)));
+		const a4 = Utility.resume(Utility.exists(Async.of(Maybe.Just(7))));
+
+		const aas = Async.all(a1, a2, a3, a4);
+
+		aas.fork(x => {
+			test.ok(equals(x, [undefined, 6, undefined, 7]));
+			test.done();
+		}, e => {
+			console.error(e);
+			test.ok(false, e);
+			test.done();
+		});
 	}
 
 };

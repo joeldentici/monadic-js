@@ -239,7 +239,7 @@ const forever = exports.forever = function(v) {
 /* Definitions for pure utility functions */
 
 /**
- *	constant :: a -> () -> a
+ *	constant :: a -> b -> a
  *
  *	When applied to a value, returns a function
  *	that will always return that value, regardless
@@ -389,4 +389,28 @@ const resume = exports.resume = function(v) {
 		else
 			return v.constructor.fail(e);
 	});
+}
+
+/**
+ *	liftMaybe :: MonadFail m => (Type m, (a -> Maybe b)) -> a -> m b
+ *
+ *	Lifts a partial function into the context of any monad that has
+ *	failure semantics. The resulting function's values will either contain
+ *	the value in the Maybe, or have a Skip error.
+ */
+const liftMaybe = exports.liftMaybe = function(m, f) {
+	return x => f(x).case({
+		Just: v => m.of(v),
+		Nothing: _ => m.fail(skip)
+	});
+}
+
+/**
+ *	exists :: MonadFail m => m (Maybe a) -> m a
+ *
+ *	Flattens a monadic computation that contains a Maybe using
+ *	the monad's fail method with a Skip error.
+ */
+const exists = exports.exists = function(v) {
+	return v.chain(x => liftMaybe(v.constructor, id)(x));
 }

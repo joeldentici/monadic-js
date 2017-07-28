@@ -1,6 +1,7 @@
 'use strict';
 const CaseClass = require('../utility.js').CaseClass;
 const Rx = require('rx');
+const Async = require('./index.js');
 
 /**
  *	MonadicJS.Async.AsyncComputation
@@ -9,7 +10,7 @@ const Rx = require('rx');
  *
  *	Holds a thunked computation.
  */
-class AsyncComputation extends CaseClass {
+class AsyncComputation extends Async {
 	/**
 	 *	new :: ((a -> (), e -> ()) -> c) -> Async c e a
 	 *
