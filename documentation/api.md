@@ -1274,14 +1274,19 @@ Equivalent to prev.seqR(this).seqL(next)
 
 Constant function returning a failing parser.
 
-This is the zero of the MonadPlus monoid, satisfying
+This is the zero (additive identity) of the MonadPlus/Alternative monoid, satisfying
 annihilation: zero() >>= f = zero(), zero().app(x) = zero()
 
-You can use empty as a zero for the Alternative/MonadPlus that does
-not interfere with sequencing (whether applicative or monadic),
-but the normal laws do not hold. Empty is more useful for parsers than
-zero is, since it is normally the case that we want a branch that
-succeeds without consuming input, not one that fails without consuming input.
+Note that empty is not a valid zero in any way as it does not satisfy
+the alternative laws -- namely empty <|> u is empty, but it would
+be u if empty was a zero. It definitely does not satisfy annihilation.
+
+Despite this, zero will probably find less use than empty, which can
+actually be useful since it succeeds. For example, the implementation of
+sepBy uses empty, but it would not work with zero, because alternating with
+zero is literally the same as not using it (because it is an identity in every
+way). But empty succeeds and thus can provide its own semantics in the alternative
+chain.
 
 Exists for fantasy-land compatability.
 ## MonadicJS.State
