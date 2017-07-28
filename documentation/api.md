@@ -89,7 +89,7 @@ Creates an Async computation. Takes a function that
 accepts two functions, one for a successful computation
 an one for a failed computation. This function is not
 executed until the Async is ran.
-#### fail :: e &#8594; Async () e ()
+#### fail :: e &#8594; Async e e ()
 
 Returns an Async computation that failed
 for the specified reason.
@@ -114,7 +114,7 @@ the Async computation will result in a NonExistenceError.
 #### fromPromise :: Promise a e &#8594; Async (Promise a e) e a
 
 Alias of await
-#### of :: a &#8594; Async () () a
+#### of :: a &#8594; Async a () a
 
 Alias for unit. Provided for fantasy-land
 compliance.
@@ -152,6 +152,17 @@ Using this will give you truly parallel computation.
 
 Runs the asynchronous computation, discarding
 the result.
+#### Scheduler a b c :: (a &#8594; b) &#8594; c
+
+A function that can be applied to a thunk to
+possibly schedule the thunk to run at a later time.
+
+Different schedulers return different results. The immediate
+scheduler <code>x => x()</code> returns the result of the thunk (b = c).
+#### setScheduler :: Scheduler a b c &#8594; Scheduler a b d
+
+Sets a new scheduler to use for all Async computations. Returns
+the old scheduler.
 #### sleep :: int &#8594; Async int () ()
 
 Creates an Async computation that sleeps for the specified
@@ -168,7 +179,7 @@ for its result.
 This method literally doesn't do anything. It is just
 here to make catching look more imperative by surrounding
 it with try.
-#### unit :: a &#8594; Async () () a
+#### unit :: a &#8594; Async a () a
 
 Puts a value into the context of
 an Async computation.
@@ -280,6 +291,23 @@ care and mainly only by the consumer of an Async computation.
 #### tapFail :: Async c e a &#8594; (e &#8594; ()) &#8594; Async c e a
 
 Tap for failures.
+#### toObservable :: Async c e a &#8594; Observable e a
+
+Creates an Observable that will run this computation
+for every observer to produce a single value for that
+observer and complete, or will end with an error if
+the computation fails.
+
+This can be useful for running actions in response to
+each event emitted by an Observable by chaining/binding
+a function to it that returns Observables created by calling
+this method on an Async.
+
+Note that this does not break the laziness of an Async computation
+as Observables are also lazy.
+
+Remember to call .share as appropriate if you only want the
+Async computation to run once for all observers.
 #### toPromise :: Async c e a &#8594; Promise a e
 
 This is the same as forking the computation, but
@@ -323,10 +351,25 @@ Reversed arguments of app.
 
 Applicative application of a function in a
 Free monad to a value in a Free monad.
+#### catch :: Free f a &#8594; (e &#8594; Free f b) &#8594; Free f (a | b)
+
+If the computation represented by this Free monad fails,
+then the specified handler will be applied to the error
+in an attempt to recover. The handler maps an error into
+a new computation.
+
+You must include Control.interpreter in your interpreter
+list to use this, or you will get an error at runtime.
 #### chain :: Free f a &#8594; (a &#8594; Free f b) &#8594; Free f b
 
 Monadic chaining/binding of a value in a Free
 monad to a function that returns a Free monad.
+#### chainFail :: Free f a &#8594; (e &#8594; Free f b) &#8594; Free f (a | b)
+
+You must include Control.interpreter in your interpreter
+list to use this, or you will get an error at runtime.
+
+Alias for catch
 #### combineTransformations :: Monad m &#8658; forall a. [f a &#8594; m (m a)] &#8594; (f a &#8594; m (m a))
 
 Combines a list of transformations into a single transformation.
@@ -342,6 +385,10 @@ If no transformation exists for a value, then an InterpreterError is thrown.
 A Free Monad with no value. Uses the control
 primitive throwE to ensure that chained functions
 will not be applied, thus satsifying <code>empty >>= f = empty</code>.
+#### fail :: e &#8594; Free f a
+
+Results in a failed computation
+with the specified error.
 #### foldConcurrent :: Monad m &#8658; Free f a &#8594; (Type m, (forall x. f x &#8594; m (m x))) &#8594; m a
 
 Interpret this Free monad into the specified monad
@@ -387,6 +434,17 @@ a Free f context
 
 Maps a function over the value in the
 Free monad.
+#### mapFail :: Free f a &#8594; (e &#8594; e2) &#8594; Free f a
+
+Maps the error in a Free monad computation. This is
+of course bypassed if the computation does not result
+in an error.
+
+This cannot be used to recover from an error, only for mapping
+them. See chainFail and catch for error recovery.
+
+You must include Control.interpreter in your interpreter
+list to use this, or you will get an error at runtime.
 #### seqL :: Free f a &#8594; Free f b &#8594; Free f a
 
 Applicative sequencing from left-to-right,
@@ -423,6 +481,18 @@ that accepts a handler for errors.
 You don't need to supply your own catch. It is what is
 returned by applying tryF. You supply a handler to that
 catch. This is purely so try-catch looks like normal JS.
+#### delay :: Free Control ()
+
+Represents a delay in further computation.
+
+This can be useful at the beginning of a Free program
+to force waiting before executing the first statement,
+which might be a plain old JS statement with a side effect
+that we did not intend to run yet. It is unimportant for
+"pure" side effects that occur in a monad.
+
+We can't get this from just using F.of since we immediately
+apply the chained function.
 #### fromAsync :: Async c e a &#8594; Free Control a
 
 Useful if you will be interpreting to Async.
@@ -447,6 +517,10 @@ whose result type is either the type of this Free Monad or the
 type of the Free Monad returned by the handler.
 
 Returning a catch is purely so that this looks like normal JS.
+
+This is unnecessary to use directly as the `chainFail, chainMap, catch`
+methods on `ConcurrentFree` all use it. It might still be useful if you
+prefer the standard try-catch look.
 ## MonadicJS.Do
 <a name="monadicjs-do"></a>
 **Written By:** Joel Dentici
@@ -651,10 +725,10 @@ Puts a value into Either context.
 **Written On:** 6/20/2017
 
 The Left constructor
-#### ap :: Left a &#8594; Either (a &#8594; b) &#8594; Left b
+#### ap :: Left a &#8594; Either e (a &#8594; b) &#8594; Left a
 
 Applicative application for fantasy-land
-#### app :: Left (a &#8594; b) &#8594; Either a &#8594; Left b
+#### app :: Left e () &#8594; Either e a &#8594; Left e ()
 
 Applicative application
 #### bind :: Left c &#8594; (a &#8594; Either c b) &#8594; Left c
@@ -756,6 +830,7 @@ is null or undefined, Nothing is returned.
 #### unit/of :: a &#8594; Just a
 
 Puts a value into Maybe context.
+#### zero :: () &#8594; Nothing
 ## MonadicJS.Maybe.Just
 <a name="monadicjs-maybe-just"></a>
 **Written By:** Joel Dentici
@@ -763,6 +838,7 @@ Puts a value into Maybe context.
 **Written On:** 6/20/2017
 
 The Just constructor
+#### alt :: Just a &#8594; Maybe b &#8594; Just a
 #### ap :: Just a &#8594; Maybe (a &#8594; b) &#8594; Maybe b
 
 Applicative application, for fantasy-land.
@@ -794,6 +870,7 @@ Construct a Just
 **Written On:** 6/20/2017
 
 The Nothing type
+#### alt :: Nothing &#8594; Maybe a &#8594; Maybe a
 #### ap :: Nothing &#8594; Maybe (a &#8594; b) &#8594; Nothing
 
 Applicative application, for fantasy-land.
@@ -983,7 +1060,8 @@ provided parser matches the upcoming input.
 
 If it does, true is returned, otherwise false
 is returned. The resulting parser does not
-consume input.
+consume input and never fails (in the sense of throwing
+an error).
 #### lookup :: Parser t a &#8594; int &#8594; LeftRecContext &#8594; Map (Parser t a) (Map int (Either ParseError [(ParseResult a), LeftRecContext])) &#8594; ParseResult a | null
 
 Tries to find a valid result in the memoization table for the provided
@@ -1194,7 +1272,16 @@ keeping the results of this.
 Equivalent to prev.seqR(this).seqL(next)
 #### zero :: () &#8594; Parser t ()
 
-Constant function returning the empty parser.
+Constant function returning a failing parser.
+
+This is the zero of the MonadPlus monoid, satisfying
+annihilation: zero() >>= f = zero(), zero().app(x) = zero()
+
+You can use empty as a zero for the Alternative/MonadPlus that does
+not interfere with sequencing (whether applicative or monadic),
+but the normal laws do not hold. Empty is more useful for parsers than
+zero is, since it is normally the case that we want a branch that
+succeeds without consuming input, not one that fails without consuming input.
 
 Exists for fantasy-land compatability.
 ## MonadicJS.State
@@ -1302,7 +1389,7 @@ method that can call the handler with its members.
 Other objects are supported, but the object itself
 will be passed to the handler (though ES6 object
 destructuring can be pretty powerful there).
-#### constant :: a &#8594; () &#8594; a
+#### constant :: a &#8594; b &#8594; a
 
 When applied to a value, returns a function
 that will always return that value, regardless
@@ -1330,6 +1417,10 @@ to be a value semantically, which means it should
 be able to be reused. The generator approach also
 cannot accommodate monads like the list monad that
 apply their bound function more than once.
+#### exists :: MonadFail m &#8658; m (Maybe a) &#8594; m a
+
+Flattens a monadic action that contains a Maybe using
+the monad's fail method with a Skip error.
 #### filterM :: Consable t, Applicative f &#8658; (Type f, (a &#8594; f bool)) &#8594; t a &#8594; f (t a)
 
 Filters a specified list by using a predicate with results
@@ -1355,6 +1446,11 @@ that empty >>= f = empty
 #### id :: a &#8594; a
 
 Always returns the value it is applied to.
+#### liftMaybe :: MonadFail m &#8658; (Type m, (a &#8594; Maybe b)) &#8594; a &#8594; m b
+
+Lifts a partial function into the context of any monad that has
+failure semantics. The resulting function's values will either contain
+the value in the Maybe, or have a Skip error.
 #### mapM :: Consable t, Applicative f &#8658; (Type f, (a &#8594; f b)) &#8594; t a &#8594; f (t b)
 
 mapM defined to work over any Consable structure and with Applicatives.
@@ -1365,6 +1461,19 @@ define this in terms of that
 
 Repeats the specified action cnt times and collects
 the results into a list.
+#### resume :: MonadFail m &#8658; m a &#8594; m a
+
+Stops the "skipping" of a action by
+handling the error that skipping introduced.
+
+If the action was not skipped, this has
+no effect (just like normal catching), and if
+the action had any error other than the skipping
+one, then it will be propagated.
+#### retry :: MonadFail m &#8658; int &#8594; (...any &#8594; m a) &#8594; ...any &#8594; m a
+
+Wraps a monadic computation/function so that if it fails, it
+is automatically retried a specified number of times.
 #### seqAll :: Monad m &#8658; (Type m, [m a]) &#8594; m [a]
 
 Like all, but uses monadic sequencing instead of
@@ -1375,6 +1484,19 @@ might
 #### seqMapM :: Monad m &#8658; (Type m, a &#8594; m b) &#8594; [a] &#8594; m [b]
 
 mapM restricted to lists and using monadic chaining.
+#### skip :: Skip
+
+A value of the type Skip. This can be used
+with `m.fail` for any `MonadFail m`.
+
+Another point in the monadic 'program' can
+use `resume(v)` to end the skipping.
+#### Skip :: Object
+
+A special type of object that can
+be used to fail an action, therefore
+skipping the rest of it, with the intention
+that the caller will handle this failure.
 #### unless :: Applicative f &#8658; (bool, f ()) &#8594; f ()
 
 Performs the specified action when the specified
