@@ -32,17 +32,26 @@ exports.Parser = {
 		const parser2 = P.recursive(() =>
 		  P.of(res2).app(parser2).app(parser2).app(parser2)
 		   .alt(a)
-		).memoize(false);
+		).memoize();
+
+		const parser3 = P.recursive(() => 
+			P.of(res).app(e).skip(P.term('.'))
+			.app(e)
+		).memoize();
+
+		const e = parser3.alt(P.term('a')).memoize();
 
 		const a = P.term('a');
 
 		const parse = result(P.runParser(parser));
 		const parse2 = result(P.runParser(parser2));
+		const parse3 = result(P.runParser(parser3));
 
 		const _ = eq(test);
 
 		_(parse('aa'), Either.of(['a','a']));
 		_(parse2('aaa'), Either.of(['a','a','a']));
+		_(parse3('a.a.a.a'), Either.of(['a', ['a', ['a', 'a']]]))
 
 		test.done();
 	},

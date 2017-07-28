@@ -380,45 +380,32 @@ class Parser_ {
 		//arg because we expect a boolean and defaults
 		//only replace if undefined (not null or number
 		//or anything else)
+		//
+		//Note: parity check is deprecated
 		if (typeof even !== 'boolean')
 			even = true;
-
-		/* Not using anymore */
-		//check based on parity of remaining input
-		//and parity of parser whether we should
-		//reuse an earlier result in a left-recursion
-		//chain.
-		/*const useresult = t => {
-			const evenInput = t % 2 === 0;
-			const evenParser = even;
-			function f() {
-				if (evenInput && evenParser)
-					return false;
-				else if (evenInput && !evenParser)
-					return true;
-				else if (!evenInput && evenParser)
-					return true;
-				else if (!evenInput && !evenParser)
-					return false;				
-			}
-
-			console.log(f());
-			return f();
-
-
-			//(t % 2 === 0 ? !even : even);
-		}*/
 
 		/* If the parser expects an even amount of input,
 		   then we apply it remainingLength + 1 times before
 		   curtailment. If it expects an odd amount of input,
 		   then we apply it remainingLength times before curtailment.
+
+		   Note: parity check is deprecated
 		*/
 		const getMaxDepth = t => {
-			if (even)
+			return t + 1;
+
+			/*if (even)
 				return t + 1;
 			else
-				return t;
+				return t;*/
+		}
+
+		const longer = (p, p2, r, r2) => {
+			if (p > p2)
+				return r;
+			else
+				return r2;
 		}
 
 		return Parser(t => p => lrec =>
@@ -441,29 +428,19 @@ class Parser_ {
 					const newLrec = lrec.setIn([name], depth + 1);
 					res = yield self.runParser(t)(p)(newLrec);
 
-					/* Not using anymore */
-					//check for a better result in the state.
-					//this will happen when we have indirect
-					//left recursion. this was not needed in
-					//the original algorithm where the result
-					//tree was accessed by going through the state
-					//(because all parses, not just the leftmost
-					//were used). but we are passing the result
-					//up the call stack so we need to check now
-					//for a better result to use.
-					//
-					//there are probably better ways to do this.
-					/*mt = yield State.get;
+					//if we have a longer result stored, use it instead!
+					mt = yield State.get;
 					let res2 = lookup(name, p, lrec, mt);
-					if (useresult(t.length - p) && res2) {
+					if (res2) {
 						res = res.case({
-							Right: _ => res,
-							Left: _ => res2.case({
-								Right: _ => res2,
+							Right: ({pos}) => res2.case({
+								Right: ({pos: pos2}) => longer(pos, pos2, res, res2),
 								Left: _ => res,
-							})
+							}),
+							Left: _ => res2
 						});
-					}*/
+					}
+
 
 					const p_ctx = pruneContext(res.case({
 						Left: ({used}) => used,
