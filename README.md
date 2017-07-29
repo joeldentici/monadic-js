@@ -242,6 +242,14 @@ Applicative Do
 Proper fantasy-land methods
   * Right now the fantasy-land methods are not 'namespaced' properly.
   
+Do/Expression source maps
+  * Right now there are no source maps
+
+Eliminating algebraic method calls from stacktraces
+  * This will likely just be a function that can be called to map the
+    error to a new one that doesn't include these calls
+  * You could then log the transformed error
+  * This would be especially nice for Async, if we eliminate setImmediate as well
 ## More Info
 Read the full API documentation [here](documentation/api.md).
 
