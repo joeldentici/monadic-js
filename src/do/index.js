@@ -66,6 +66,11 @@ module.exports = function(ext = '.ejs', verbose = 0) {
 		});		
 	}
 
+	function load(module, filename, jsFileName) {
+		const code = `module.exports = require("./${jsFileName}");`;
+		module._compile(code, filename);
+	}
+
 	Module._extensions[ext] = function(module, filename) {
 		const jsFileName = '.' + path.basename(filename, ext) + '.js';
 		const jsFilePath = path.join(
@@ -89,14 +94,14 @@ module.exports = function(ext = '.ejs', verbose = 0) {
 		if (ejsStats.mtime > jsStats.mtime) {
 			const code = processFile(filename);
 			fs.writeFileSync(jsFilePath, code);
-			module._compile(code, filename);
+			load(module, filename, jsFileName);
 		}
 		//yay we can quickly load the cached copy
 		else {
 			verbose && console.log("Loading cached copy of " + filename);
-			const code = fs.readFileSync(jsFilePath, 'utf8');
+			load(module, filename, jsFileName);
 			verbose && console.log("Loaded cached copy of " + filename);
-			module._compile(code, filename);
+
 		}
 	}
 
