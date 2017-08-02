@@ -72,7 +72,7 @@ module.exports = function(ext = '.ejs', verbose = 0) {
 	}
 
 	Module._extensions[ext] = function(module, filename) {
-		const jsFileName = '.' + path.basename(filename, ext) + '.js';
+		const jsFileName = '.' + path.basename(filename, ext);
 		const jsFilePath = path.join(
 			path.dirname(filename),
 			jsFileName
