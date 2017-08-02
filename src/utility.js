@@ -297,7 +297,7 @@ const caseOf = exports.caseOf = function(obj, switchobj) {
 	//"caseable" + match
 	if (switchobj[type] &&
 		typeof obj.doCase === 'function') {
-		return obj.doCase(switchobj[type]);
+		return obj.doCase((...args) => switchobj[type](...args));
 	}
 	//match
 	else if (switchobj[type]) {
