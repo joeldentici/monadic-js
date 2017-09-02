@@ -24,7 +24,7 @@ const generate = module.exports = function(ast) {
 		StringExpression: str => str,
 		BooleanExpression: bool => bool,
 		ArrayExpression: generateArray,
-		ObjectExpression: generateObject,
+		ObjectExpression: paren(generateObject),
 		ObjectBinding: (left, right) => 
 			left + " : " + generate(right),
 		IdBinding: id => id,
@@ -68,9 +68,13 @@ function generateArray(exprs) {
 	return '[ ' + exprs.map(generate).join(', ') + ' ]';
 }
 
+function paren(gen) {
+	return (...args) => '(' + gen(...args) + ')';
+}
+
 function generateObject(bindings) {
-	return '({ ' + bindings.map(generate).join(', ')
-	 + ' })';
+	return '{ ' + bindings.map(generate).join(', ')
+	 + ' }';
 }
 
 

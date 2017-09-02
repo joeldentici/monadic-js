@@ -38,7 +38,7 @@ exports.Do = {
 		_(transformJS(input2), Either.of('abc'));
 		_(transformJS(input3), Either.of('"abc"'));
 		_(transformJS(input4), Either.of('[ true, false ]'));
-		_(transformJS(input5), Either.of('{ a, b, c : "d" }'));
+		_(transformJS(input5), Either.of('({ a, b, c : "d" })'));
 		_(transformJS(input6), Either.of('(x) => x + 1'));
 		_(transformJS(input7), Either.of('(x, y) => x + y'));
 		_(transformJS(input8), Either.of('([ x, y ]) => x + y'));
