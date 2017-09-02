@@ -69,8 +69,8 @@ function generateArray(exprs) {
 }
 
 function generateObject(bindings) {
-	return '{ ' + bindings.map(generate).join(', ')
-	 + ' }';
+	return '({ ' + bindings.map(generate).join(', ')
+	 + ' })';
 }
 
 
