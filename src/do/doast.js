@@ -171,15 +171,35 @@ class VarBindingExpression extends CaseClass {
 }
 
 class DoBlock extends CaseClass {
-	constructor(monad, statements) {
+	constructor(monad, statements, isAst = false) {
 		super('DoBlock');
 		this.monad = monad;
 		this.statements = statements;
+		this.isAst = isAst;
 	}
 
 	doCase(fn) {
-		return fn(this.monad, this.statements);
+		return fn(this.monad, this.statements, this.isAst);
 	}
+}
+
+class AstExpr extends CaseClass {
+	constructor(lang, expr) {
+		super('AstExpr');
+		this.lang = lang;
+		this.expr = expr;
+	}
+
+	doCase(fn) {
+		return fn(this.lang, this.expr);
+	}
+}
+
+function AstBlock(inner) {
+	return inner.case({
+		DoBlock: (m, s, a) => new DoBlock(m, s, true),
+		AstExpr: _ => inner,
+	});
 }
 
 class BinaryOperatorExpression extends CaseClass {
@@ -252,4 +272,6 @@ module.exports = {
 	BinaryOperatorExpression: o => l => r => new BinaryOperatorExpression(o, l, r),
 	UnaryOperatorExpression: o => e => new UnaryOperatorExpression(o, e),
 	IfElseBlock: c => t => f => new IfElseBlock(c, t, f),
+	AstExpr: i => e => new AstExpr(i, e),
+	AstBlock
 };

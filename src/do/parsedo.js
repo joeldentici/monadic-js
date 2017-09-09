@@ -6,7 +6,7 @@ const {
 	ArrowExpression, IdExpression, StringExpression,
 	NumberExpression, VarBindingExpression, DoBindingStatement,
 	DoBlock, BinaryOperatorExpression, UnaryOperatorExpression,
-	BooleanExpression, IfElseBlock
+	BooleanExpression, IfElseBlock, AstExpr, AstBlock
 } = require('./doast.js');
 
 /**
@@ -39,6 +39,7 @@ const operator = lexeme => word(P.token(t => t.lexeme === lexeme)(lexeme).result
 /* The lexical grammar, repeated */
 const _do = operator('Do');
 const _expr = operator('Expr');
+const _ast = operator('Ast');
 const sequence = operator('Sequence');
 const arrow = operator('Arrow');
 const assignment = operator('Assignment');
@@ -187,6 +188,7 @@ const value = P.recursive(() =>
 	.or(doBlock)
 	.or(exprBlock)
 	.or(ifElse)
+	.or(astBlock)
 );
 
 
@@ -465,6 +467,18 @@ const ifElse = P.of(IfElseBlock)
 	.skip(_else)
 	.app(expr)
 	.memoize(false, 13);
+
+/* Parse an ast expression */
+const astExpr = P.of(AstExpr)
+	.app(identifier)
+	.app(expr.wrap(lbrace, rbrace))
+	.memoize(false, 14);
+
+/* Parse an ast block (ast expression or ast do block) */
+const astBlock = P.of(AstBlock)
+	.skip(_ast)
+	.app(astExpr.or(doBlock))
+	.memoize(false, 15);
 
 /* Export parsers for do and expr blocks */
 const parse = P.runParser(expr, false);

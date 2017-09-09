@@ -67,12 +67,47 @@ function isExpr(tokens, pos) {
 }
 
 /**
+ *	isAst :: ([Token], int) -> bool
+ *
+ *	Checks is we are at a possible ast block.
+ */
+function isAst(tokens, pos) {
+	return isX(tokens, pos, 'Ast', ['Do', 'Identifier']);
+}
+
+/**
+ *	isOneOf :: ...(([Token], int) -> bool) -> ([Token], int) -> bool
+ *
+ *	Checks if we are at any of the specified types of blocks.
+ */
+function isOneOf(...matchers) {
+	return (tokens, pos) => matchers.some(m => m(tokens, pos));
+}
+
+/**
+ *	isExt :: ([Token], int) -> bool
+ *
+ *	Checks if we are at an expression extension block.
+ */
+const isExt = isOneOf(
+	isDo,
+	isExpr,
+	isAst
+);
+
+/**
  *	isX :: ([Token], int, string, string) -> bool
  *
  *	Checks if the current position is the beginning
  *	of some type of phrase.
  */
 function isX(tokens, pos, lexeme, nextLexeme) {
+	if (typeof nextLexeme !== 'object'
+		|| !(nextLexeme instanceof Array))
+		nextLexeme = [nextLexeme];
+
+	const lexemes = new Set(nextLexeme);
+
 	if (tokens[pos].lexeme !== lexeme)
 		return false;
 	pos++;
@@ -81,7 +116,7 @@ function isX(tokens, pos, lexeme, nextLexeme) {
 		&& skipped.has(tokens[pos].lexeme))
 		pos++;
 
-	if (tokens[pos].lexeme !== nextLexeme)
+	if (!lexemes.has(tokens[pos].lexeme))
 		return false;
 
 	return true;	
@@ -108,7 +143,7 @@ const transformJS = module.exports = function(source) {
 	while (pos < tokens.length) {
 		token = tokens[pos];
 
-		if (isDo(tokens, pos) || isExpr(tokens, pos)) {
+		if (isExt(tokens, pos)) {
 			const res = transformBlock(tokens, pos);
 
 			const error = res.case({

@@ -14,6 +14,7 @@ grammar["//[^\\n]*"] = "Comment";
 grammar["do!"] = "Sequence";
 grammar["\\bexpr\\b"] = "Expr";
 grammar["\\bdo\\b"] = "Do";
+grammar["\\bast\\b"] = "Ast";
 grammar["=>"] = "Arrow";
 grammar["<-"] = "Bind";
 grammar["\\("] = "LParen";
