@@ -209,7 +209,11 @@ class Parser_ {
 	 *	between some and many.
 	 */
 	sepByPlus(parser) {
-		return this.seqL(parser.alt(Parser.empty)).some;
+		const f = this;
+		const m = parser.seqR(this).many;
+		const e = parser.alt(Parser.empty);
+
+		return f.map(x => yz => [].concat(x || [], yz)).app(m).seqL(e);
 	}
 
 	/**
@@ -242,7 +246,10 @@ class Parser_ {
 	 *	an [0, infinity) (many) number of times.
 	 */
 	sepBy(parser) {
-		return this.seqL(parser.alt(Parser.empty)).many;
+		const m = this.seqL(parser).many;
+		const e = this.alt(Parser.empty);
+
+		return m.map(yz => z => [].concat(yz, z || [])).app(e);
 	}
 
 	/**
